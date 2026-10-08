@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,19 +21,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.BluetoothDisabled
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -49,18 +43,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.data.model.BluetoothDeviceInfo
 import com.example.data.model.ConnectionStatus
 import com.example.ui.ParkingViewModel
 import com.example.ui.theme.CrimsonRed
 import com.example.ui.theme.CyberAmber
-import com.example.ui.theme.DarkSurface
-import com.example.ui.theme.DarkSurfaceBorder
-import com.example.ui.theme.DarkSurfaceElevated
 import com.example.ui.theme.ElectricCyan
 import com.example.ui.theme.NeonEmerald
-import com.example.ui.theme.TextPrimary
-import com.example.ui.theme.TextSecondary
 
 @Composable
 fun BluetoothScreen(
@@ -85,14 +73,14 @@ fun BluetoothScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(18.dp))
-                .background(DarkSurfaceElevated)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(
                     1.dp,
                     when (connStatus) {
                         is ConnectionStatus.Connected -> NeonEmerald.copy(alpha = 0.6f)
                         is ConnectionStatus.Connecting -> ElectricCyan.copy(alpha = 0.6f)
                         is ConnectionStatus.Error -> CrimsonRed.copy(alpha = 0.6f)
-                        else -> DarkSurfaceBorder
+                        else -> MaterialTheme.colorScheme.outline
                     },
                     RoundedCornerShape(18.dp)
                 )
@@ -104,16 +92,19 @@ fun BluetoothScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Box(
                             modifier = Modifier
                                 .size(44.dp)
                                 .clip(CircleShape)
                                 .background(
                                     when (connStatus) {
-                                        is ConnectionStatus.Connected -> NeonEmerald.copy(alpha = 0.15f)
-                                        is ConnectionStatus.Connecting -> ElectricCyan.copy(alpha = 0.15f)
-                                        else -> DarkSurface
+                                        is ConnectionStatus.Connected -> NeonEmerald.copy(alpha = 0.18f)
+                                        is ConnectionStatus.Connecting -> ElectricCyan.copy(alpha = 0.18f)
+                                        else -> MaterialTheme.colorScheme.surface
                                     }
                                 ),
                             contentAlignment = Alignment.Center
@@ -128,7 +119,7 @@ fun BluetoothScreen(
                                 tint = when (connStatus) {
                                     is ConnectionStatus.Connected -> NeonEmerald
                                     is ConnectionStatus.Connecting -> ElectricCyan
-                                    else -> TextSecondary
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
                                 },
                                 modifier = Modifier.size(24.dp)
                             )
@@ -141,21 +132,21 @@ fun BluetoothScreen(
                                 text = "HC-05 Bluetooth Serial (SPP)",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = when (connStatus) {
                                     is ConnectionStatus.Connected -> "Connected to ${(connStatus as ConnectionStatus.Connected).deviceName}"
                                     is ConnectionStatus.Connecting -> "Connecting to ${(connStatus as ConnectionStatus.Connecting).deviceName}..."
                                     is ConnectionStatus.Error -> (connStatus as ConnectionStatus.Error).message
-                                    else -> "Ready to pair and receive 9600 baud serial"
+                                    else -> "Disconnected — Select your paired HC-05 below"
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = when (connStatus) {
                                     is ConnectionStatus.Connected -> NeonEmerald
                                     is ConnectionStatus.Connecting -> ElectricCyan
                                     is ConnectionStatus.Error -> CrimsonRed
-                                    else -> TextSecondary
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
                                 }
                             )
                         }
@@ -192,8 +183,8 @@ fun BluetoothScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(DarkSurfaceElevated)
-                .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -206,7 +197,7 @@ fun BluetoothScreen(
                         text = "Paired Devices",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     IconButton(
                         onClick = { viewModel.refreshPairedDevices() },
@@ -227,21 +218,21 @@ fun BluetoothScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp))
-                            .background(DarkSurface)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(14.dp)
                     ) {
                         Column {
                             Text(
-                                text = "No paired devices found yet",
+                                text = "No paired Bluetooth devices detected",
                                 fontWeight = FontWeight.SemiBold,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 13.sp
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "1. Turn on HC-05 on Arduino Uno (LED will blink fast)\n2. Open Android Settings > Bluetooth > Pair New Device\n3. Tap 'HC-05' and enter PIN '1234' or '0000'\n4. Tap the Refresh button above to connect!",
+                                text = "1. Power your Arduino Uno and HC-05 module (5V)\n2. Open Android Settings > Bluetooth > Pair New Device\n3. Tap 'HC-05' (Default Pairing PIN: 1234 or 0000)\n4. Return here and tap Refresh to connect!",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 11.sp,
                                 lineHeight = 16.sp
                             )
@@ -258,10 +249,10 @@ fun BluetoothScreen(
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(if (isHc05) ElectricCyan.copy(alpha = 0.10f) else DarkSurface)
+                                .background(if (isHc05) ElectricCyan.copy(alpha = 0.10f) else MaterialTheme.colorScheme.surface)
                                 .border(
                                     1.dp,
-                                    if (isHc05) ElectricCyan.copy(alpha = 0.4f) else DarkSurfaceBorder,
+                                    if (isHc05) ElectricCyan.copy(alpha = 0.45f) else MaterialTheme.colorScheme.outline,
                                     RoundedCornerShape(10.dp)
                                 )
                                 .padding(12.dp)
@@ -276,7 +267,7 @@ fun BluetoothScreen(
                                         Text(
                                             text = device.name,
                                             fontWeight = FontWeight.Bold,
-                                            color = TextPrimary,
+                                            color = MaterialTheme.colorScheme.onSurface,
                                             fontSize = 14.sp
                                         )
                                         if (isHc05) {
@@ -288,10 +279,10 @@ fun BluetoothScreen(
                                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                                             ) {
                                                 Text(
-                                                    text = "RECOMMENDED",
+                                                    text = "HC-05 TARGET",
                                                     fontSize = 8.sp,
                                                     fontWeight = FontWeight.ExtraBold,
-                                                    color = DarkSurface
+                                                    color = Color.White
                                                 )
                                             }
                                         }
@@ -299,15 +290,15 @@ fun BluetoothScreen(
                                     Text(
                                         text = device.address,
                                         fontSize = 11.sp,
-                                        color = TextSecondary
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
 
                                 Button(
                                     onClick = { viewModel.connectToDevice(device.address, device.name) },
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isHc05) ElectricCyan else DarkSurfaceElevated,
-                                        contentColor = if (isHc05) DarkSurface else TextPrimary
+                                        containerColor = if (isHc05) ElectricCyan else MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = if (isHc05) Color.White else MaterialTheme.colorScheme.onPrimaryContainer
                                     ),
                                     shape = RoundedCornerShape(8.dp),
                                     modifier = Modifier.testTag("connect_device_${device.address}")
@@ -325,51 +316,33 @@ fun BluetoothScreen(
             }
         }
 
-        // Live Serial Telemetry Terminal Card
+        // Live Real Serial Telemetry Console
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(DarkSurfaceElevated)
-                .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Terminal,
-                            contentDescription = "Console",
-                            tint = NeonEmerald,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Live Telemetry Feed (9600 Baud)",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
-                    }
-
-                    // Test Inject telemetry button
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.parseArduinoTelemetryLine("S1:OCCUPIED")
-                            viewModel.parseArduinoTelemetryLine("S2:EMPTY")
-                            viewModel.parseArduinoTelemetryLine("S3:OCCUPIED")
-                            viewModel.parseArduinoTelemetryLine("TOTAL:2")
-                            viewModel.parseArduinoTelemetryLine("GATE:OPEN")
-                        },
-                        shape = RoundedCornerShape(6.dp),
-                        modifier = Modifier.testTag("simulate_telemetry_btn")
-                    ) {
-                        Text("Simulate Packet", fontSize = 10.sp)
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Terminal,
+                        contentDescription = "Console",
+                        tint = NeonEmerald,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Live HC-05 Serial Feed (9600 Baud)",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -378,7 +351,7 @@ fun BluetoothScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp)
+                        .height(130.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color(0xFF070A0F))
                         .border(1.dp, Color(0xFF161F2E), RoundedCornerShape(8.dp))
@@ -387,13 +360,13 @@ fun BluetoothScreen(
                     val logs = state.rawTelemetryLog
                     if (logs.isEmpty()) {
                         Text(
-                            text = "> Waiting for incoming serial telemetry lines...\n> Format: S1:OCCUPIED, S2:EMPTY, S3:EMPTY, TOTAL:1, GATE:OPEN",
+                            text = "> Standby: Waiting for Arduino serial lines...\n> Format: S1:OCCUPIED, S2:EMPTY, S3:EMPTY, TOTAL:1, GATE:OPEN",
                             fontFamily = FontFamily.Monospace,
                             fontSize = 11.sp,
-                            color = TextSecondary.copy(alpha = 0.6f)
+                            color = Color(0xFF64748B)
                         )
                     } else {
-                        val displayLogs = logs.takeLast(7).joinToString("\n") { "> $it" }
+                        val displayLogs = logs.takeLast(6).joinToString("\n") { "> $it" }
                         Text(
                             text = displayLogs,
                             fontFamily = FontFamily.Monospace,
@@ -405,13 +378,13 @@ fun BluetoothScreen(
             }
         }
 
-        // Arduino Circuit Wiring Schematic Reference Card
+        // Arduino Circuit Wiring Schematic Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(DarkSurfaceElevated)
-                .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -424,10 +397,10 @@ fun BluetoothScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Arduino Uno Pin Reference",
+                        text = "Arduino Uno Hardware Pinout",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -453,7 +426,7 @@ fun BluetoothScreen(
                         Text(
                             text = component,
                             fontSize = 12.sp,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Medium
                         )
                         Text(

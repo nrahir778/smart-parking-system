@@ -10,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -47,12 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.GateState
 import com.example.ui.theme.CrimsonRed
-import com.example.ui.theme.CyberAmber
-import com.example.ui.theme.DarkSurface
-import com.example.ui.theme.DarkSurfaceElevated
 import com.example.ui.theme.NeonEmerald
-import com.example.ui.theme.TextPrimary
-import com.example.ui.theme.TextSecondary
 
 @Composable
 fun GateBoomBarrierCard(
@@ -60,7 +55,9 @@ fun GateBoomBarrierCard(
     buzzerAlert: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // 0 deg = OPEN (pointing up), 90 deg = CLOSED (horizontal)
+    val isDark = isSystemInDarkTheme()
+
+    // 0 deg = OPEN (pointing up), 90 deg = CLOSED (horizontal across lane)
     val targetAngle = if (gateState == GateState.CLOSED) 0f else -75f
     val animatedAngle by animateFloatAsState(
         targetValue = targetAngle,
@@ -84,7 +81,7 @@ fun GateBoomBarrierCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(DarkSurfaceElevated)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .border(
                 1.dp,
                 if (gateState == GateState.CLOSED) CrimsonRed.copy(alpha = 0.6f) else NeonEmerald.copy(alpha = 0.4f),
@@ -122,7 +119,7 @@ fun GateBoomBarrierCard(
                         Text(
                             text = "MG995 Entry Barrier Gate",
                             style = MaterialTheme.typography.titleSmall,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
@@ -161,14 +158,14 @@ fun GateBoomBarrierCard(
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(DarkSurface)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "Buzzer: Normal",
                             fontSize = 11.sp,
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -182,8 +179,8 @@ fun GateBoomBarrierCard(
                     .fillMaxWidth()
                     .height(95.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF0F131C))
-                    .border(1.dp, Color(0xFF1E2638), RoundedCornerShape(12.dp))
+                    .background(if (isDark) Color(0xFF0F131C) else Color(0xFF1E2430))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
             ) {
                 Canvas(modifier = Modifier.fillMaxWidth().height(95.dp)) {
                     val w = size.width
@@ -229,14 +226,14 @@ fun GateBoomBarrierCard(
                         cornerRadius = CornerRadius(4f, 4f)
                     )
 
-                    // Post body (industrial yellow & black)
+                    // Post body (industrial safety yellow & black)
                     drawRoundRect(
                         color = Color(0xFFF59E0B),
                         topLeft = Offset(postX, postY),
                         size = Size(postW, postH),
                         cornerRadius = CornerRadius(6f, 6f)
                     )
-                    // Post grill / stripe
+                    // Post grill
                     drawRoundRect(
                         color = Color(0xFF18181B),
                         topLeft = Offset(postX + 4f, postY + 8f),

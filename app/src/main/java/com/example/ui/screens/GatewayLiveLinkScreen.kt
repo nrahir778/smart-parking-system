@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -60,14 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.ui.ParkingViewModel
-import com.example.ui.theme.DarkBg
-import com.example.ui.theme.DarkSurface
-import com.example.ui.theme.DarkSurfaceBorder
-import com.example.ui.theme.DarkSurfaceElevated
 import com.example.ui.theme.ElectricCyan
 import com.example.ui.theme.NeonEmerald
-import com.example.ui.theme.TextPrimary
-import com.example.ui.theme.TextSecondary
 
 @Composable
 fun GatewayLiveLinkScreen(
@@ -102,8 +95,12 @@ fun GatewayLiveLinkScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(18.dp))
-                .background(DarkSurfaceElevated)
-                .border(1.dp, if (gatewayConfig.enabled) ElectricCyan.copy(alpha = 0.5f) else DarkSurfaceBorder, RoundedCornerShape(18.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(
+                    1.dp,
+                    if (gatewayConfig.enabled) ElectricCyan.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline,
+                    RoundedCornerShape(18.dp)
+                )
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -112,18 +109,21 @@ fun GatewayLiveLinkScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Box(
                             modifier = Modifier
                                 .size(42.dp)
                                 .clip(CircleShape)
-                                .background(if (gatewayConfig.enabled) ElectricCyan.copy(alpha = 0.2f) else DarkSurface),
+                                .background(if (gatewayConfig.enabled) ElectricCyan.copy(alpha = 0.18f) else MaterialTheme.colorScheme.surface),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.CloudSync,
                                 contentDescription = "Gateway",
-                                tint = if (gatewayConfig.enabled) ElectricCyan else TextSecondary,
+                                tint = if (gatewayConfig.enabled) ElectricCyan else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -133,12 +133,12 @@ fun GatewayLiveLinkScreen(
                                 text = "IoT Phone Gateway Sync",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = if (gatewayConfig.enabled) "Relaying Bluetooth to Cloud in real-time" else "Gateway paused",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = if (gatewayConfig.enabled) NeonEmerald else TextSecondary
+                                color = if (gatewayConfig.enabled) NeonEmerald else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -165,11 +165,11 @@ fun GatewayLiveLinkScreen(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(DarkSurface)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(10.dp)
                     ) {
                         Column {
-                            Text(text = "PACKETS SENT", fontSize = 9.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                            Text(text = "PACKETS SENT", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                             Text(text = "${gatewayConfig.totalPacketsSent}", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = ElectricCyan)
                         }
                     }
@@ -178,11 +178,11 @@ fun GatewayLiveLinkScreen(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(DarkSurface)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(10.dp)
                     ) {
                         Column {
-                            Text(text = "STATUS", fontSize = 9.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                            Text(text = "STATUS", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                             Text(
                                 text = if (gatewayConfig.lastStatusCode > 0) "HTTP ${gatewayConfig.lastStatusCode}" else "Active",
                                 fontSize = 16.sp,
@@ -196,16 +196,16 @@ fun GatewayLiveLinkScreen(
                         modifier = Modifier
                             .weight(1.3f)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(DarkSurface)
+                            .background(MaterialTheme.colorScheme.surface)
                             .padding(10.dp)
                     ) {
                         Column {
-                            Text(text = "SYNC FEEDBACK", fontSize = 9.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                            Text(text = "SYNC FEEDBACK", fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                             Text(
                                 text = gatewayConfig.lastStatusMessage,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1
                             )
                         }
@@ -219,7 +219,7 @@ fun GatewayLiveLinkScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(18.dp))
-                .background(DarkSurfaceElevated)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(1.dp, NeonEmerald.copy(alpha = 0.4f), RoundedCornerShape(18.dp))
                 .padding(16.dp)
         ) {
@@ -245,12 +245,12 @@ fun GatewayLiveLinkScreen(
                             text = "Public Live Link (GitHub Pages)",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "Anyone can view live parking status in browser",
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -283,7 +283,7 @@ fun GatewayLiveLinkScreen(
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = ElectricCyan,
-                            contentColor = DarkBg
+                            contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(8.dp),
                         modifier = Modifier.weight(1f).testTag("copy_link_btn")
@@ -298,7 +298,7 @@ fun GatewayLiveLinkScreen(
                         onClick = {
                             val sendIntent = Intent().apply {
                                 action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "Check out the live 3-slot parking status: $publicWebUrl")
+                                putExtra(Intent.EXTRA_TEXT, "Check out our school live 3-slot smart parking status: $publicWebUrl")
                                 type = "text/plain"
                             }
                             context.startActivity(Intent.createChooser(sendIntent, "Share Smart Parking Link"))
@@ -348,7 +348,6 @@ fun GatewayLiveLinkScreen(
                                     webViewClient = WebViewClient()
                                     settings.javaScriptEnabled = true
                                     settings.domStorageEnabled = true
-                                    // Load the embedded web dashboard HTML
                                     loadUrl("file:///android_asset/web_dashboard.html")
                                 }
                             },
@@ -364,8 +363,8 @@ fun GatewayLiveLinkScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(DarkSurfaceElevated)
-                .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -373,12 +372,12 @@ fun GatewayLiveLinkScreen(
                     text = "Firebase Database REST Endpoint",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Phone sends JSON payload to this endpoint via HTTP PUT",
+                    text = "Phone sends JSON payload to this endpoint via HTTP PUT when Arduino telemetry changes",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp
                 )
 
@@ -419,19 +418,19 @@ fun GatewayLiveLinkScreen(
                     Text(
                         text = "Last: ${if (gatewayConfig.lastSyncTime > 0) "${(System.currentTimeMillis() - gatewayConfig.lastSyncTime) / 1000}s ago" else "Never"}",
                         fontSize = 11.sp,
-                        color = TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
 
-        // GitHub Pages 2-Minute Deployment Guide Card
+        // GitHub Pages Deployment Guide Card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(DarkSurfaceElevated)
-                .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -439,18 +438,18 @@ fun GatewayLiveLinkScreen(
                     text = "How to Host on GitHub Pages (Free)",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "The web app file 'docs/index.html' is already prepared in your project!\n\n" +
+                    text = "The web app file 'docs/index.html' is prepared in your project!\n\n" +
                             "1. Create a GitHub repository (e.g. 'smart-parking')\n" +
                             "2. Push your project or upload 'docs/index.html'\n" +
                             "3. Go to GitHub Repo > Settings > Pages\n" +
                             "4. Under Branch, select 'main' and folder '/docs' (or root)\n" +
                             "5. Click Save — Your public URL will be live!",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
                     lineHeight = 18.sp
                 )
@@ -462,8 +461,8 @@ fun GatewayLiveLinkScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(DarkSurfaceElevated)
-                .border(1.dp, DarkSurfaceBorder, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -471,7 +470,7 @@ fun GatewayLiveLinkScreen(
                     text = "Live Payload Preview (JSON)",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Box(

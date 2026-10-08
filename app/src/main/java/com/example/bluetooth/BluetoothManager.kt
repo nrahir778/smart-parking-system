@@ -182,8 +182,6 @@ class BluetoothManager(private val context: Context) {
             socket?.close()
         } catch (_: Exception) {}
         socket = null
-        if (_connectionStatus.value !is ConnectionStatus.Simulation) {
-            _connectionStatus.value = ConnectionStatus.Disconnected
-        }
+        _connectionStatus.value = ConnectionStatus.Disconnected
     }
 }

@@ -6,9 +6,9 @@ enum class GateState {
 }
 
 enum class CarType(val displayName: String, val bodyColor: Long, val styleName: String) {
-    RED_SEDAN("Red Aero Sedan", 0xFFDC2626, "Sport Sedan"),
-    BLUE_SUV("Midnight Blue SUV", 0xFF2563EB, "Electric SUV"),
-    YELLOW_SPORTS("Cyber Amber GT", 0xFFF59E0B, "Performance Coupe")
+    RED_SEDAN("Red Metallic Aero Sedan", 0xFFDC2626, "Sport Sedan"),
+    BLUE_SUV("Midnight Sapphire SUV", 0xFF2563EB, "Electric SUV"),
+    YELLOW_SPORTS("Cyber Amber GT Coupe", 0xFFF59E0B, "Performance Coupe")
 }
 
 data class ParkingSlotInfo(
@@ -21,13 +21,15 @@ data class ParkingSlotInfo(
 )
 
 data class ParkingLotState(
+    val hasReceivedData: Boolean = false,
+    val isConnected: Boolean = false,
     val slot1: Boolean = false,
     val slot2: Boolean = false,
     val slot3: Boolean = false,
     val totalOccupied: Int = 0,
     val gateState: GateState = GateState.OPEN,
     val buzzerAlert: Boolean = false,
-    val lastUpdated: Long = System.currentTimeMillis(),
+    val lastUpdated: Long = 0L,
     val rawTelemetryLog: List<String> = emptyList(),
     val connectionStatus: ConnectionStatus = ConnectionStatus.Disconnected
 ) {
@@ -50,7 +52,6 @@ sealed class ConnectionStatus {
     data class Connecting(val deviceName: String) : ConnectionStatus()
     data class Connected(val deviceName: String, val deviceAddress: String) : ConnectionStatus()
     data class Error(val message: String) : ConnectionStatus()
-    object Simulation : ConnectionStatus()
 }
 
 data class GatewayConfig(

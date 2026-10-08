@@ -10,8 +10,23 @@ import org.junit.Test
 class ParkingTelemetryTest {
 
     @Test
-    fun `test initial state calculations`() {
+    fun `test initial state is not showing data before bluetooth connection`() {
+        val state = ParkingLotState()
+        assertFalse(state.hasReceivedData)
+        assertFalse(state.isConnected)
+        assertFalse(state.slot1)
+        assertFalse(state.slot2)
+        assertFalse(state.slot3)
+        assertEquals(0, state.totalOccupied)
+        assertEquals(3, state.availableCount)
+        assertEquals(0L, state.lastUpdated)
+    }
+
+    @Test
+    fun `test received state calculations`() {
         val state = ParkingLotState(
+            hasReceivedData = true,
+            isConnected = true,
             slot1 = true,
             slot2 = false,
             slot3 = true,
@@ -29,6 +44,8 @@ class ParkingTelemetryTest {
     @Test
     fun `test full occupancy calculations`() {
         val state = ParkingLotState(
+            hasReceivedData = true,
+            isConnected = true,
             slot1 = true,
             slot2 = true,
             slot3 = true,

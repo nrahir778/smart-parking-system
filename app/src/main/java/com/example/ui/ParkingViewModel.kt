@@ -10,12 +10,9 @@ import com.example.data.model.GateState
 import com.example.data.model.GatewayConfig
 import com.example.data.model.ParkingLotState
 import com.example.gateway.GatewaySyncManager
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class ParkingViewModel(application: Application) : AndroidViewModel(application) {
@@ -23,14 +20,18 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
     val bluetoothManager = BluetoothManager(application)
     val gatewaySyncManager = GatewaySyncManager()
 
+    // Pure initial state: NO DEMO READINGS. Has not received data yet.
     private val _parkingState = MutableStateFlow(
         ParkingLotState(
-            slot1 = true,
+            hasReceivedData = false,
+            isConnected = false,
+            slot1 = false,
             slot2 = false,
             slot3 = false,
-            totalOccupied = 1,
+            totalOccupied = 0,
             gateState = GateState.OPEN,
-            buzzerAlert = false
+            buzzerAlert = false,
+            lastUpdated = 0L
         )
     )
     val parkingState: StateFlow<ParkingLotState> = _parkingState.asStateFlow()
@@ -38,23 +39,29 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
     val connectionStatus: StateFlow<ConnectionStatus> = bluetoothManager.connectionStatus
     val gatewayConfig: StateFlow<GatewayConfig> = gatewaySyncManager.config
 
-    private val _isSimulationActive = MutableStateFlow(false)
-    val isSimulationActive: StateFlow<Boolean> = _isSimulationActive.asStateFlow()
-
     private val _pairedDevices = MutableStateFlow<List<BluetoothDeviceInfo>>(emptyList())
     val pairedDevices: StateFlow<List<BluetoothDeviceInfo>> = _pairedDevices.asStateFlow()
 
-    private var simulationJob: Job? = null
-
     init {
         refreshPairedDevices()
+        observeBluetoothConnection()
         observeBluetoothTelemetry()
-        // Sync initial default state to gateway
-        gatewaySyncManager.syncParkingState(_parkingState.value, force = true)
     }
 
     fun refreshPairedDevices() {
         _pairedDevices.value = bluetoothManager.getPairedDevices()
+    }
+
+    private fun observeBluetoothConnection() {
+        viewModelScope.launch {
+            bluetoothManager.connectionStatus.collect { status ->
+                val connected = status is ConnectionStatus.Connected
+                _parkingState.value = _parkingState.value.copy(
+                    isConnected = connected,
+                    connectionStatus = status
+                )
+            }
+        }
     }
 
     private fun observeBluetoothTelemetry() {
@@ -68,7 +75,7 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
     fun parseArduinoTelemetryLine(line: String) {
         val trimmed = line.trim()
         val currentLogs = _parkingState.value.rawTelemetryLog.toMutableList()
-        if (currentLogs.size > 40) currentLogs.removeAt(0)
+        if (currentLogs.size > 50) currentLogs.removeAt(0)
         currentLogs.add("${System.currentTimeMillis() % 100000}: $trimmed")
 
         var s1 = _parkingState.value.slot1
@@ -97,7 +104,6 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        // Compute total and buzzer logic aligned with Arduino code
         val calculatedTotal = (if (s1) 1 else 0) + (if (s2) 1 else 0) + (if (s3) 1 else 0)
         val finalTotal = if (total in 0..3) total else calculatedTotal
         val allFull = calculatedTotal >= 3 || finalTotal >= 3
@@ -106,7 +112,10 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
             gate = GateState.CLOSED
         }
 
+        // Updated with real Arduino reading!
         val newState = _parkingState.value.copy(
+            hasReceivedData = true,
+            isConnected = true,
             slot1 = s1,
             slot2 = s2,
             slot3 = s3,
@@ -121,77 +130,15 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
         gatewaySyncManager.syncParkingState(newState)
     }
 
-    fun toggleSlotManually(slotId: Int) {
-        val cur = _parkingState.value
-        val newS1 = if (slotId == 1) !cur.slot1 else cur.slot1
-        val newS2 = if (slotId == 2) !cur.slot2 else cur.slot2
-        val newS3 = if (slotId == 3) !cur.slot3 else cur.slot3
-
-        val total = (if (newS1) 1 else 0) + (if (newS2) 1 else 0) + (if (newS3) 1 else 0)
-        val allOccupied = total >= 3
-        val gate = if (allOccupied) GateState.CLOSED else GateState.OPEN
-
-        val newState = cur.copy(
-            slot1 = newS1,
-            slot2 = newS2,
-            slot3 = newS3,
-            totalOccupied = total,
-            gateState = gate,
-            buzzerAlert = allOccupied,
-            lastUpdated = System.currentTimeMillis()
-        )
-        _parkingState.value = newState
-        gatewaySyncManager.syncParkingState(newState, force = true)
-    }
-
-    fun setAllSlotsState(s1: Boolean, s2: Boolean, s3: Boolean) {
-        val total = (if (s1) 1 else 0) + (if (s2) 1 else 0) + (if (s3) 1 else 0)
-        val allOccupied = total >= 3
-        val newState = _parkingState.value.copy(
-            slot1 = s1,
-            slot2 = s2,
-            slot3 = s3,
-            totalOccupied = total,
-            gateState = if (allOccupied) GateState.CLOSED else GateState.OPEN,
-            buzzerAlert = allOccupied,
-            lastUpdated = System.currentTimeMillis()
-        )
-        _parkingState.value = newState
-        gatewaySyncManager.syncParkingState(newState, force = true)
-    }
-
-    fun toggleAutoTrafficSimulation(enabled: Boolean) {
-        _isSimulationActive.value = enabled
-        simulationJob?.cancel()
-        if (enabled) {
-            simulationJob = viewModelScope.launch {
-                val demoPatterns = listOf(
-                    Triple(true, false, false),
-                    Triple(true, true, false),
-                    Triple(true, true, true), // Full -> Gate Closes, Buzzer Alerts!
-                    Triple(false, true, true),
-                    Triple(false, false, true),
-                    Triple(false, false, false)
-                )
-                var index = 0
-                while (isActive) {
-                    val pattern = demoPatterns[index % demoPatterns.size]
-                    setAllSlotsState(pattern.first, pattern.second, pattern.third)
-                    index++
-                    delay(3500)
-                }
-            }
-        }
-    }
-
     fun connectToDevice(address: String, name: String) {
-        _isSimulationActive.value = false
-        simulationJob?.cancel()
         bluetoothManager.connectToDevice(address, name)
     }
 
     fun disconnectBluetooth() {
         bluetoothManager.disconnect()
+        _parkingState.value = _parkingState.value.copy(
+            isConnected = false
+        )
     }
 
     fun updateGatewayEndpoint(url: String) {

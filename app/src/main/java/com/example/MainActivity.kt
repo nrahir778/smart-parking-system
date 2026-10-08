@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -27,6 +26,7 @@ import androidx.compose.material.icons.outlined.CloudSync
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -41,7 +41,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -50,13 +49,7 @@ import com.example.ui.ParkingViewModel
 import com.example.ui.screens.BluetoothScreen
 import com.example.ui.screens.GatewayLiveLinkScreen
 import com.example.ui.screens.HomeScreen
-import com.example.ui.theme.DarkBg
-import com.example.ui.theme.DarkSurface
-import com.example.ui.theme.DarkSurfaceElevated
-import com.example.ui.theme.ElectricCyan
 import com.example.ui.theme.MyApplicationTheme
-import com.example.ui.theme.TextPrimary
-import com.example.ui.theme.TextSecondary
 
 enum class NavTab(val title: String) {
     DECK("Parking Deck"),
@@ -82,7 +75,7 @@ fun MainAppContainer() {
     val viewModel: ParkingViewModel = viewModel()
     var selectedTab by remember { mutableStateOf(NavTab.DECK) }
 
-    // Request Bluetooth permissions on Android 12+ or location on older devices
+    // Request Bluetooth permissions
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) {
@@ -107,29 +100,30 @@ fun MainAppContainer() {
 
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
-        containerColor = DarkBg,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = when (selectedTab) {
-                            NavTab.DECK -> "Smart Parking 3-Slot"
+                            NavTab.DECK -> "Smart Traffic Parking (3 Slots)"
                             NavTab.BLUETOOTH -> "HC-05 Bluetooth Telemetry"
                             NavTab.GATEWAY -> "Gateway & Public Live Link"
                         },
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkSurface
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
         bottomBar = {
             NavigationBar(
-                containerColor = DarkSurface,
+                containerColor = MaterialTheme.colorScheme.surface,
                 modifier = Modifier
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .testTag("main_navigation_bar")
@@ -146,11 +140,11 @@ fun MainAppContainer() {
                     },
                     label = { Text("Deck", fontSize = 11.sp) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = DarkBg,
-                        selectedTextColor = ElectricCyan,
-                        indicatorColor = ElectricCyan,
-                        unselectedIconColor = TextSecondary,
-                        unselectedTextColor = TextSecondary
+                        selectedIconColor = MaterialTheme.colorScheme.surface,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     modifier = Modifier.testTag("nav_tab_deck")
                 )
@@ -170,11 +164,11 @@ fun MainAppContainer() {
                     },
                     label = { Text("HC-05 BT", fontSize = 11.sp) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = DarkBg,
-                        selectedTextColor = ElectricCyan,
-                        indicatorColor = ElectricCyan,
-                        unselectedIconColor = TextSecondary,
-                        unselectedTextColor = TextSecondary
+                        selectedIconColor = MaterialTheme.colorScheme.surface,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     modifier = Modifier.testTag("nav_tab_bluetooth")
                 )
@@ -191,11 +185,11 @@ fun MainAppContainer() {
                     },
                     label = { Text("Live Link", fontSize = 11.sp) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = DarkBg,
-                        selectedTextColor = ElectricCyan,
-                        indicatorColor = ElectricCyan,
-                        unselectedIconColor = TextSecondary,
-                        unselectedTextColor = TextSecondary
+                        selectedIconColor = MaterialTheme.colorScheme.surface,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     modifier = Modifier.testTag("nav_tab_gateway")
                 )
@@ -206,7 +200,7 @@ fun MainAppContainer() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(DarkBg)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             when (selectedTab) {
                 NavTab.DECK -> HomeScreen(

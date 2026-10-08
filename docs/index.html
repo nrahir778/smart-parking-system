@@ -3,21 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Parking Live Dashboard | Arduino Uno + HC-05 IoT Gateway</title>
+  <title>Smart Traffic Parking Live Deck | Arduino Uno + HC-05 IoT Gateway</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f17;
-      --surface: #131b28;
-      --surface-elevated: #1b2536;
+      --bg: #090d14;
+      --surface: #111827;
+      --surface-elevated: #1b2436;
       --border: #26354a;
       --emerald: #10b981;
       --red: #ef4444;
-      --cyan: #0ea5e9;
+      --cyan: #0284c7;
       --amber: #f59e0b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
+      --grass: #15803d;
+      --road: #151922;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f1f5f9;
+        --surface: #ffffff;
+        --surface-elevated: #f8fafc;
+        --border: #cbd5e1;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --grass: #22c55e;
+        --road: #262c38;
+      }
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,7 +49,7 @@
 
     .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 920px;
     }
 
     /* Header */
@@ -49,6 +64,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
 
     .brand {
@@ -67,6 +83,7 @@
       justify-content: center;
       font-weight: 800;
       font-size: 20px;
+      color: white;
     }
 
     .brand-title h1 {
@@ -119,6 +136,7 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .stat-label {
@@ -127,66 +145,125 @@
       letter-spacing: 0.05em;
       color: var(--text-muted);
       margin-bottom: 6px;
+      font-weight: 700;
     }
 
     .stat-value {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 800;
       display: flex;
       align-items: baseline;
       gap: 6px;
     }
 
-    /* Parking Lot Deck */
+    /* Traffic Park Landscape Deck */
     .lot-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 24px;
+      padding: 20px;
       margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     }
 
-    .lot-header {
+    .landscape-container {
+      background: #14532d;
+      border: 3px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .greenery-verge-top {
+      height: 38px;
+      background: linear-gradient(180deg, #16a34a, #15803d);
+      border-bottom: 4px solid #94a3b8;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      justify-content: space-around;
+      padding: 0 20px;
+    }
+
+    .bush {
+      width: 22px;
+      height: 22px;
+      background: #0b4626;
+      border-radius: 50%;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .bush::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #4ade80;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
     }
 
     .asphalt-deck {
-      background: #141822;
-      border: 2px solid #232a39;
-      border-radius: 16px;
-      padding: 24px 16px 40px;
+      background: var(--road);
+      padding: 24px 20px 20px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       position: relative;
     }
 
+    .road-bottom {
+      height: 52px;
+      background: #1a202c;
+      border-top: 3px solid #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .yellow-dash {
+      width: 40px;
+      height: 4px;
+      background: #facc15;
+      border-radius: 2px;
+    }
+
+    .crosswalk {
+      display: flex;
+      gap: 6px;
+    }
+    .crosswalk-stripe {
+      width: 7px;
+      height: 36px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 1px;
+    }
+
     .slot-bay {
-      background: rgba(19, 27, 40, 0.7);
-      border: 2px dashed #333f54;
+      background: rgba(19, 27, 40, 0.8);
+      border: 2px dashed #475569;
       border-radius: 12px;
-      padding: 14px 10px;
+      padding: 12px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
-      min-height: 270px;
+      min-height: 280px;
       transition: all 0.4s ease;
     }
 
     .slot-bay.occupied {
       border: 2px solid var(--red);
-      background: rgba(239, 68, 68, 0.05);
-      box-shadow: 0 0 25px rgba(239, 68, 68, 0.15);
+      background: rgba(239, 68, 68, 0.08);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.2);
     }
 
     .slot-bay.empty {
       border: 2px solid var(--emerald);
-      background: rgba(16, 185, 129, 0.05);
-      box-shadow: 0 0 25px rgba(16, 185, 129, 0.12);
+      background: rgba(16, 185, 129, 0.08);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
     }
 
     .slot-sensor-bar {
@@ -199,6 +276,7 @@
       padding: 6px 8px;
       font-size: 0.75rem;
       margin-bottom: 12px;
+      color: white;
     }
 
     .sensor-led {
@@ -227,14 +305,14 @@
     }
 
     .car-svg {
-      width: 90px;
-      height: 165px;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.6));
+      width: 95px;
+      height: 175px;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,0.65));
       animation: carEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     @keyframes carEnter {
-      from { transform: translateY(30px) scale(0.9); opacity: 0; }
+      from { transform: translateY(35px) scale(0.9); opacity: 0; }
       to { transform: translateY(0) scale(1); opacity: 1; }
     }
 
@@ -250,7 +328,7 @@
       width: 52px;
       height: 52px;
       border-radius: 50%;
-      background: rgba(16, 185, 129, 0.12);
+      background: rgba(16, 185, 129, 0.15);
       border: 2px solid var(--emerald);
       display: flex;
       align-items: center;
@@ -272,6 +350,15 @@
       border-radius: 3px;
       margin-top: 10px;
       border: 1px solid #333f54;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .reflector {
+      width: 14px;
+      height: 4px;
+      background: #facc15;
+      border-radius: 1px;
     }
 
     /* Gate Bar Card */
@@ -310,7 +397,6 @@
       color: var(--red);
     }
 
-    /* Telemetry log / Config */
     .footer-bar {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -326,32 +412,12 @@
       gap: 10px;
     }
 
-    .config-box {
-      margin-top: 16px;
-      background: #0b0f17;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 0.75rem;
-    }
-
-    .config-box input {
-      background: #182233;
-      border: 1px solid var(--border);
-      color: white;
-      padding: 6px 10px;
-      border-radius: 6px;
-      width: 100%;
-      margin-top: 6px;
-      font-family: monospace;
-    }
-
     @media (max-width: 680px) {
       .asphalt-deck {
         grid-template-columns: 1fr;
       }
       .slot-bay {
-        min-height: 220px;
+        min-height: 230px;
       }
     }
   </style>
@@ -362,7 +428,7 @@
       <div class="brand">
         <div class="brand-icon">P</div>
         <div class="brand-title">
-          <h1>Smart Parking Public Live Link</h1>
+          <h1>Smart Traffic Parking Live Link</h1>
           <p>Shree Sarkari Madhyamik Shala Lakhapar • IoT Gateway</p>
         </div>
       </div>
@@ -374,12 +440,12 @@
 
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Available Slots</div>
-        <div class="stat-value" id="valAvailable" style="color: var(--emerald);">2 <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 free</span></div>
+        <div class="stat-label">Available Bays</div>
+        <div class="stat-value" id="valAvailable" style="color: var(--emerald);">-- <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 free</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Occupied Slots</div>
-        <div class="stat-value" id="valOccupied" style="color: var(--cyan);">1 <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 slots</span></div>
+        <div class="stat-label">Occupied Bays</div>
+        <div class="stat-value" id="valOccupied" style="color: var(--cyan);">-- <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 slots</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Entry Barrier Gate</div>
@@ -391,77 +457,87 @@
       </div>
     </div>
 
-    <!-- 3-Slot Visual Deck -->
+    <!-- 3-Slot Visual Traffic Park Deck with Greenery and Road -->
     <div class="lot-card">
-      <div class="lot-header">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <div>
-          <h2>Overhead Parking Visualizer</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem;">Realistic top-down graphics synced with HC-05 ultrasonic sensors</p>
+          <h2>Realistic Traffic Parking Deck</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Photorealistic top-down vehicles & landscaped environment</p>
         </div>
-        <button onclick="refreshData()" style="background: var(--surface-elevated); border: 1px solid var(--border); color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">
+        <button onclick="refreshData()" style="background: var(--surface-elevated); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">
           ↻ Refresh
         </button>
       </div>
 
-      <div class="asphalt-deck">
-        <!-- SLOT 1 -->
-        <div id="bay1" class="slot-bay occupied">
-          <div class="slot-sensor-bar">
-            <span><strong>SLOT 01</strong> (Trig 4 / Echo 5)</span>
-            <div id="led1" class="sensor-led red"></div>
-          </div>
-          <div class="slot-car-area" id="carArea1">
-            <!-- Red Sedan SVG -->
-            <svg class="car-svg" viewBox="0 0 100 180">
-              <rect x="5" y="10" width="90" height="160" rx="20" fill="#dc2626"/>
-              <rect x="0" y="30" width="10" height="30" rx="3" fill="#1e242b"/>
-              <rect x="90" y="30" width="10" height="30" rx="3" fill="#1e242b"/>
-              <rect x="0" y="120" width="10" height="30" rx="3" fill="#1e242b"/>
-              <rect x="90" y="120" width="10" height="30" rx="3" fill="#1e242b"/>
-              <!-- Windshield -->
-              <polygon points="20,70 30,50 70,50 80,70" fill="#0f172a"/>
-              <rect x="25" y="78" width="50" height="30" rx="6" fill="#1e293b"/>
-              <!-- Rear Windshield -->
-              <polygon points="25,120 75,120 80,138 20,138" fill="#0f172a"/>
-              <!-- Headlights -->
-              <rect x="18" y="12" width="18" height="6" rx="2" fill="#ffffff"/>
-              <rect x="64" y="12" width="18" height="6" rx="2" fill="#ffffff"/>
-              <!-- Taillights -->
-              <rect x="20" y="165" width="60" height="4" rx="2" fill="#ff2222"/>
-            </svg>
-            <div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>
-          </div>
-          <div class="wheel-stop"></div>
+      <div class="landscape-container">
+        <!-- Top Greenery & Hedge Shrubs -->
+        <div class="greenery-verge-top">
+          <div class="bush"></div>
+          <div class="bush"></div>
+          <div class="bush"></div>
+          <div class="bush"></div>
+          <div class="bush"></div>
         </div>
 
-        <!-- SLOT 2 -->
-        <div id="bay2" class="slot-bay empty">
-          <div class="slot-sensor-bar">
-            <span><strong>SLOT 02</strong> (Trig 6 / Echo 7)</span>
-            <div id="led2" class="sensor-led green"></div>
-          </div>
-          <div class="slot-car-area" id="carArea2">
-            <div class="empty-badge">
-              <div class="empty-icon">✓</div>
-              <div style="font-size: 0.85rem; font-weight: 700;">AVAILABLE</div>
+        <!-- 3 Parking Bays -->
+        <div class="asphalt-deck">
+          <!-- SLOT 1 -->
+          <div id="bay1" class="slot-bay">
+            <div class="slot-sensor-bar">
+              <span><strong>SLOT 01</strong> (T4/E5)</span>
+              <div id="led1" class="sensor-led green"></div>
             </div>
+            <div class="slot-car-area" id="carArea1">
+              <div class="empty-badge">
+                <div class="empty-icon">✓</div>
+                <div style="font-size: 0.85rem; font-weight: 700;">VACANT</div>
+              </div>
+            </div>
+            <div class="wheel-stop"><div class="reflector"></div><div class="reflector"></div></div>
           </div>
-          <div class="wheel-stop"></div>
+
+          <!-- SLOT 2 -->
+          <div id="bay2" class="slot-bay">
+            <div class="slot-sensor-bar">
+              <span><strong>SLOT 02</strong> (T6/E7)</span>
+              <div id="led2" class="sensor-led green"></div>
+            </div>
+            <div class="slot-car-area" id="carArea2">
+              <div class="empty-badge">
+                <div class="empty-icon">✓</div>
+                <div style="font-size: 0.85rem; font-weight: 700;">VACANT</div>
+              </div>
+            </div>
+            <div class="wheel-stop"><div class="reflector"></div><div class="reflector"></div></div>
+          </div>
+
+          <!-- SLOT 3 -->
+          <div id="bay3" class="slot-bay">
+            <div class="slot-sensor-bar">
+              <span><strong>SLOT 03</strong> (T9/E10)</span>
+              <div id="led3" class="sensor-led green"></div>
+            </div>
+            <div class="slot-car-area" id="carArea3">
+              <div class="empty-badge">
+                <div class="empty-icon">✓</div>
+                <div style="font-size: 0.85rem; font-weight: 700;">VACANT</div>
+              </div>
+            </div>
+            <div class="wheel-stop"><div class="reflector"></div><div class="reflector"></div></div>
+          </div>
         </div>
 
-        <!-- SLOT 3 -->
-        <div id="bay3" class="slot-bay empty">
-          <div class="slot-sensor-bar">
-            <span><strong>SLOT 03</strong> (Trig 9 / Echo 10)</span>
-            <div id="led3" class="sensor-led green"></div>
+        <!-- Bottom Driving Lane with Crosswalk & Yellow Line -->
+        <div class="road-bottom">
+          <div class="crosswalk">
+            <div class="crosswalk-stripe"></div>
+            <div class="crosswalk-stripe"></div>
+            <div class="crosswalk-stripe"></div>
+            <div class="crosswalk-stripe"></div>
           </div>
-          <div class="slot-car-area" id="carArea3">
-            <div class="empty-badge">
-              <div class="empty-icon">✓</div>
-              <div style="font-size: 0.85rem; font-weight: 700;">AVAILABLE</div>
-            </div>
-          </div>
-          <div class="wheel-stop"></div>
+          <div class="yellow-dash"></div>
+          <div class="yellow-dash"></div>
+          <div style="color: rgba(255,255,255,0.7); font-size: 11px; font-weight: bold;">ENTRY ➔</div>
         </div>
       </div>
     </div>
@@ -477,36 +553,23 @@
       </div>
     </div>
 
-    <!-- Live Telemetry & Config -->
+    <!-- Live Telemetry Bar -->
     <div class="footer-bar">
-      <div>Telemetry: <span id="syncTimestamp">Connected</span></div>
+      <div>Telemetry: <span id="syncTimestamp">Waiting for Arduino...</span></div>
       <div>Protocol: HC-05 SPP @ 9600 Baud</div>
-    </div>
-
-    <div class="config-box">
-      <strong>Firebase Realtime Database REST URL:</strong>
-      <input type="text" id="firebaseUrlInput" value="https://smart-parking-iot-default-rtdb.firebaseio.com/parking_live.json" onchange="updateFirebaseUrl()">
-      <div style="color: var(--text-muted); margin-top: 4px;">Enter your Firebase Database URL or use the Android Gateway sync endpoint.</div>
     </div>
   </div>
 
   <script>
     let firebaseUrl = localStorage.getItem('parking_firebase_url') || 'https://smart-parking-iot-default-rtdb.firebaseio.com/parking_live.json';
-    document.getElementById('firebaseUrlInput').value = firebaseUrl;
-
-    function updateFirebaseUrl() {
-      firebaseUrl = document.getElementById('firebaseUrlInput').value;
-      localStorage.setItem('parking_firebase_url', firebaseUrl);
-      refreshData();
-    }
 
     const carSvgs = {
-      s1: `<svg class="car-svg" viewBox="0 0 100 180"><rect x="5" y="10" width="90" height="160" rx="20" fill="#dc2626"/><rect x="0" y="30" width="10" height="30" rx="3" fill="#1e242b"/><rect x="90" y="30" width="10" height="30" rx="3" fill="#1e242b"/><rect x="0" y="120" width="10" height="30" rx="3" fill="#1e242b"/><rect x="90" y="120" width="10" height="30" rx="3" fill="#1e242b"/><polygon points="20,70 30,50 70,50 80,70" fill="#0f172a"/><rect x="25" y="78" width="50" height="30" rx="6" fill="#1e293b"/><polygon points="25,120 75,120 80,138 20,138" fill="#0f172a"/><rect x="18" y="12" width="18" height="6" rx="2" fill="#ffffff"/><rect x="64" y="12" width="18" height="6" rx="2" fill="#ffffff"/><rect x="20" y="165" width="60" height="4" rx="2" fill="#ff2222"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`,
-      s2: `<svg class="car-svg" viewBox="0 0 100 180"><rect x="2" y="10" width="96" height="160" rx="24" fill="#2563eb"/><rect x="0" y="32" width="11" height="32" rx="4" fill="#181c22"/><rect x="89" y="32" width="11" height="32" rx="4" fill="#181c22"/><rect x="0" y="118" width="11" height="32" rx="4" fill="#181c22"/><rect x="89" y="118" width="11" height="32" rx="4" fill="#181c22"/><polygon points="18,65 26,45 74,45 82,65" fill="#0f172a"/><rect x="22" y="75" width="56" height="34" rx="6" fill="#1e293b"/><rect x="18" y="52" width="5" height="70" rx="2" fill="#cbd5e1"/><rect x="77" y="52" width="5" height="70" rx="2" fill="#cbd5e1"/><rect x="20" y="120" width="60" height="20" rx="4" fill="#0f172a"/><rect x="15" y="12" width="20" height="7" rx="2" fill="#ffffff"/><rect x="65" y="12" width="20" height="7" rx="2" fill="#ffffff"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`,
-      s3: `<svg class="car-svg" viewBox="0 0 100 180"><rect x="5" y="10" width="90" height="160" rx="20" fill="#f59e0b"/><rect x="0" y="30" width="10" height="30" rx="3" fill="#171717"/><rect x="90" y="30" width="10" height="30" rx="3" fill="#171717"/><rect x="0" y="120" width="10" height="30" rx="3" fill="#171717"/><rect x="90" y="120" width="10" height="30" rx="3" fill="#171717"/><rect x="28" y="24" width="12" height="16" rx="3" fill="#1e293b"/><rect x="60" y="24" width="12" height="16" rx="3" fill="#1e293b"/><polygon points="20,70 30,50 70,50 80,70" fill="#0f172a"/><rect x="25" y="78" width="50" height="28" rx="6" fill="#171717"/><polygon points="25,118 75,118 80,136 20,136" fill="#0f172a"/><rect x="14" y="152" width="72" height="6" rx="2" fill="#09090b"/><rect x="16" y="12" width="18" height="6" rx="2" fill="#ffffff"/><rect x="66" y="12" width="18" height="6" rx="2" fill="#ffffff"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`
+      s1: `<svg class="car-svg" viewBox="0 0 100 180"><defs><linearGradient id="gSedan" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7f1d1d"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient></defs><rect x="6" y="8" width="88" height="164" rx="22" fill="url(#gSedan)"/><rect x="1" y="28" width="9" height="32" rx="3" fill="#14171c"/><rect x="90" y="28" width="9" height="32" rx="3" fill="#14171c"/><rect x="1" y="120" width="9" height="32" rx="3" fill="#14171c"/><rect x="90" y="120" width="9" height="32" rx="3" fill="#14171c"/><polygon points="18,68 26,48 74,48 82,68" fill="#090d14"/><rect x="24" y="74" width="52" height="34" rx="6" fill="#1e293b"/><circle cx="34" cy="58" r="6" stroke="#475569" stroke-width="2" fill="none"/><polygon points="22,118 78,118 82,138 18,138" fill="#090d14"/><rect x="14" y="10" width="18" height="7" rx="2" fill="#ffffff"/><rect x="68" y="10" width="18" height="7" rx="2" fill="#ffffff"/><rect x="16" y="167" width="68" height="4" rx="2" fill="#ff1a1a"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`,
+      s2: `<svg class="car-svg" viewBox="0 0 100 180"><defs><linearGradient id="gSuv" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#172554"/><stop offset="50%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#172554"/></linearGradient></defs><rect x="3" y="8" width="94" height="164" rx="26" fill="url(#gSuv)"/><rect x="0" y="30" width="10" height="34" rx="4" fill="#111418"/><rect x="90" y="30" width="10" height="34" rx="4" fill="#111418"/><rect x="0" y="118" width="10" height="34" rx="4" fill="#111418"/><rect x="90" y="118" width="10" height="34" rx="4" fill="#111418"/><rect x="18" y="52" width="5" height="72" rx="2" fill="#cbd5e1"/><rect x="77" y="52" width="5" height="72" rx="2" fill="#cbd5e1"/><polygon points="16,66 24,46 76,46 84,66" fill="#090d14"/><rect x="22" y="72" width="56" height="42" rx="6" fill="#1e293b"/><rect x="18" y="122" width="64" height="22" rx="4" fill="#090d14"/><rect x="12" y="10" width="20" height="8" rx="2" fill="#ffffff"/><rect x="68" y="10" width="20" height="8" rx="2" fill="#ffffff"/><rect x="12" y="166" width="22" height="5" rx="2" fill="#ef4444"/><rect x="66" y="166" width="22" height="5" rx="2" fill="#ef4444"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`,
+      s3: `<svg class="car-svg" viewBox="0 0 100 180"><defs><linearGradient id="gCoupe" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#b45309"/><stop offset="50%" stop-color="#fde047"/><stop offset="100%" stop-color="#b45309"/></linearGradient></defs><rect x="5" y="8" width="90" height="164" rx="22" fill="url(#gCoupe)"/><rect x="0" y="30" width="10" height="32" rx="3" fill="#14171a"/><rect x="90" y="30" width="10" height="32" rx="3" fill="#14171a"/><rect x="0" y="118" width="10" height="32" rx="3" fill="#14171a"/><rect x="90" y="118" width="10" height="32" rx="3" fill="#14171a"/><rect x="28" y="24" width="12" height="16" rx="3" fill="#141416"/><rect x="60" y="24" width="12" height="16" rx="3" fill="#141416"/><polygon points="18,68 26,48 74,48 82,68" fill="#090d14"/><rect x="24" y="74" width="52" height="30" rx="6" fill="#141416"/><polygon points="22,118 78,118 82,136 18,136" fill="#090d14"/><rect x="10" y="152" width="80" height="7" rx="2" fill="#09090b"/><rect x="14" y="10" width="18" height="7" rx="2" fill="#ffffff"/><rect x="68" y="10" width="18" height="7" rx="2" fill="#ffffff"/><rect x="16" y="166" width="68" height="4" rx="2" fill="#ef4444"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`
     };
 
-    const emptyHtml = `<div class="empty-badge"><div class="empty-icon">✓</div><div style="font-size: 0.85rem; font-weight: 700;">AVAILABLE</div></div>`;
+    const emptyHtml = `<div class="empty-badge"><div class="empty-icon">✓</div><div style="font-size: 0.85rem; font-weight: 700;">VACANT</div></div>`;
 
     function updateUI(data) {
       const s1 = Boolean(data.slot1);
@@ -524,14 +587,10 @@
       document.getElementById('valGate').innerHTML = isClosed ? '<span style="color:var(--red);">CLOSED (90°)</span>' : '<span style="color:var(--emerald);">OPEN (0°)</span>';
       document.getElementById('valBuzzer').innerHTML = buzzer ? '<span style="color:var(--red);font-weight:bold;">ALERT ON (Pin 8)</span>' : 'OFF';
 
-      // Update Slot 1
       renderSlot('bay1', 'led1', 'carArea1', s1, carSvgs.s1);
-      // Update Slot 2
       renderSlot('bay2', 'led2', 'carArea2', s2, carSvgs.s2);
-      // Update Slot 3
       renderSlot('bay3', 'led3', 'carArea3', s3, carSvgs.s3);
 
-      // Gate Badge
       const gateBadge = document.getElementById('gateBadge');
       if (isClosed) {
         gateBadge.className = 'gate-status-pill gate-closed';
@@ -541,7 +600,7 @@
         gateBadge.innerText = 'GATE OPEN (0°)';
       }
 
-      document.getElementById('syncTimestamp').innerText = 'Live Synced ' + new Date().toLocaleTimeString();
+      document.getElementById('syncTimestamp').innerText = 'Synced at ' + new Date().toLocaleTimeString();
     }
 
     function renderSlot(bayId, ledId, areaId, isOccupied, carSvg) {
@@ -565,16 +624,15 @@
         const res = await fetch(firebaseUrl);
         if (res.ok) {
           const data = await res.json();
-          if (data) {
+          if (data && typeof data === 'object') {
             updateUI(data);
           }
         }
       } catch (e) {
-        console.log('Firebase poll fallback notice:', e);
+        console.log('Firebase poll status:', e);
       }
     }
 
-    // Auto-poll every 1.5 seconds
     setInterval(refreshData, 1500);
     refreshData();
   </script>

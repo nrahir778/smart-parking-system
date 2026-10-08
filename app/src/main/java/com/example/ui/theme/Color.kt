@@ -2,32 +2,53 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// High-Tech Automotive Palette
-val DarkBg = Color(0xFF0B0F17)
-val DarkSurface = Color(0xFF131B28)
-val DarkSurfaceElevated = Color(0xFF1B2536)
+// Dark Palette (Obsidian / Titanium)
+val DarkBg = Color(0xFF090D14)
+val DarkSurface = Color(0xFF111827)
+val DarkSurfaceElevated = Color(0xFF1B2436)
 val DarkSurfaceBorder = Color(0xFF26354A)
 
-// Status & Accents
+// Light Palette (Clean Slate / Automotive Showroom)
+val LightBg = Color(0xFFF1F5F9)
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceElevated = Color(0xFFF8FAFC)
+val LightSurfaceBorder = Color(0xFFCBD5E1)
+
+// Status & Sensor Accents
 val NeonEmerald = Color(0xFF10B981)
 val NeonEmeraldGlow = Color(0x3310B981)
 val CrimsonRed = Color(0xFFEF4444)
 val CrimsonRedGlow = Color(0x33EF4444)
-val ElectricCyan = Color(0xFF0EA5E9)
+val ElectricCyan = Color(0xFF0284C7)
+val ElectricCyanDark = Color(0xFF0EA5E9)
 val CyberAmber = Color(0xFFF59E0B)
 
-// Parking Asphalt & Markings
-val AsphaltDark = Color(0xFF161920)
-val AsphaltBorder = Color(0xFF232834)
-val RoadLineWhite = Color(0xFFE2E8F0)
+// Parking Asphalt & Pavement
+val AsphaltDark = Color(0xFF151922)
+val AsphaltLight = Color(0xFF2A303C)
+val AsphaltBorder = Color(0xFF2E384D)
+val RoadLineWhite = Color(0xFFF8FAFC)
 val RoadLineYellow = Color(0xFFFACC15)
+val ConcreteCurb = Color(0xFF94A3B8)
 
-// Cars
-val CarRed = Color(0xFFDC2626)
-val CarBlue = Color(0xFF2563EB)
-val CarYellow = Color(0xFFEAB308)
+// Realistic Greenery & Landscaping
+val GrassLight = Color(0xFF22C55E)
+val GrassDark = Color(0xFF15803D)
+val GrassBaseNight = Color(0xFF0D3320)
+val BushGreenLight = Color(0xFF16A34A)
+val BushGreenDark = Color(0xFF0B4626)
+val SoilMulch = Color(0xFF3E2723)
 
-// Text
-val TextPrimary = Color(0xFFF8FAFC)
-val TextSecondary = Color(0xFF94A3B8)
-val TextMuted = Color(0xFF64748B)
+// Cars - Realistic Automotive Finishes
+val CarRedMetallic = Color(0xFFDC2626)
+val CarBlueMetallic = Color(0xFF2563EB)
+val CarAmberMetallic = Color(0xFFF59E0B)
+
+// Typography
+val DarkTextPrimary = Color(0xFFF8FAFC)
+val DarkTextSecondary = Color(0xFF94A3B8)
+val DarkTextMuted = Color(0xFF64748B)
+
+val LightTextPrimary = Color(0xFF0F172A)
+val LightTextSecondary = Color(0xFF475569)
+val LightTextMuted = Color(0xFF64748B)
