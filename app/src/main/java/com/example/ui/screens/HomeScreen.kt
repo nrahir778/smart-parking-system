@@ -316,8 +316,8 @@ fun HomeScreen(
             slotId = 1,
             hasData = state.hasReceivedData,
             isOccupied = state.slot1,
-            carName = "Crimson Metallic Sport Sedan",
-            carColor = CarRedMetallic,
+            carName = "Lime Green Police Cruiser (Police Badge & Star)",
+            carColor = com.example.ui.theme.LimeGreenPolice,
             pins = "HC-SR04 • TRIG Pin 4 • ECHO Pin 5"
         )
 
@@ -325,8 +325,8 @@ fun HomeScreen(
             slotId = 2,
             hasData = state.hasReceivedData,
             isOccupied = state.slot2,
-            carName = "Midnight Sapphire Luxury SUV",
-            carColor = CarBlueMetallic,
+            carName = "Lime Green Sports GT Coupe",
+            carColor = com.example.ui.theme.LimeGreenSport,
             pins = "HC-SR04 • TRIG Pin 6 • ECHO Pin 7"
         )
 
@@ -334,8 +334,8 @@ fun HomeScreen(
             slotId = 3,
             hasData = state.hasReceivedData,
             isOccupied = state.slot3,
-            carName = "Cyber Amber GT Performance",
-            carColor = CarAmberMetallic,
+            carName = "Vintage Red Classic Beetle Coupe",
+            carColor = com.example.ui.theme.VintageRedClassic,
             pins = "HC-SR04 • TRIG Pin 9 • ECHO Pin 10"
         )
 

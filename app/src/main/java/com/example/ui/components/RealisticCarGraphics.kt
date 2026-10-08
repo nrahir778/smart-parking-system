@@ -36,7 +36,7 @@ fun RealisticTopDownCar(
     // Smooth parking glide-in animation
     val parkProgress by animateFloatAsState(
         targetValue = if (isParked) 1f else 0f,
-        animationSpec = tween(durationMillis = 550, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
         label = "parkProgress"
     )
 
@@ -63,698 +63,511 @@ fun RealisticTopDownCar(
             val h = size.height
 
             when (carType) {
-                CarType.RED_SEDAN -> drawPhotorealisticSedan(w, h, headlightPulse, parkProgress)
-                CarType.BLUE_SUV -> drawPhotorealisticSuv(w, h, headlightPulse, parkProgress)
-                CarType.YELLOW_SPORTS -> drawPhotorealisticGtCoupe(w, h, headlightPulse, parkProgress)
+                CarType.GREEN_POLICE -> drawLimeGreenPoliceCar(w, h, headlightPulse, parkProgress)
+                CarType.GREEN_SPORTS -> drawLimeGreenSportsCoupe(w, h, headlightPulse, parkProgress)
+                CarType.RED_VINTAGE -> drawVintageRedClassicBeetle(w, h, headlightPulse, parkProgress)
             }
         }
     }
 }
 
-// -------------------------------------------------------------
-// 1. CRIMSON METALLIC EXECUTIVE SPORT SEDAN
-// -------------------------------------------------------------
-private fun DrawScope.drawPhotorealisticSedan(w: Float, h: Float, pulse: Float, progress: Float) {
-    val carW = w * 0.60f
+// -----------------------------------------------------------------------------------------
+// 1. SLOT 1: LIME GREEN POLICE CRUISER (Matching User's Toy Police Car with Badges & Lightning)
+// -----------------------------------------------------------------------------------------
+private fun DrawScope.drawLimeGreenPoliceCar(w: Float, h: Float, pulse: Float, progress: Float) {
+    val carW = w * 0.62f
     val carH = h * 0.84f
     val cx = w / 2f
     val cy = h / 2f + (1f - progress) * 8f
     val left = cx - carW / 2f
     val top = cy - carH / 2f
 
-    // 1. Ambient Occlusion + Diffuse Ground Shadows
+    // Ground Drop Shadows
     drawRoundRect(
-        color = Color(0x33000000),
-        topLeft = Offset(left - 8f, top + 8f),
-        size = Size(carW + 16f, carH + 12f),
-        cornerRadius = CornerRadius(24f, 24f)
-    )
-    drawRoundRect(
-        color = Color(0x77000000),
-        topLeft = Offset(left - 3f, top + 4f),
-        size = Size(carW + 6f, carH + 6f),
+        color = Color(0x38000000),
+        topLeft = Offset(left - 6f, top + 8f),
+        size = Size(carW + 12f, carH + 12f),
         cornerRadius = CornerRadius(22f, 22f)
     )
 
-    // 2. Wheels with Brake Discs & Red Calipers
+    // 4 Wheels
     val wheelW = carW * 0.16f
     val wheelH = carH * 0.22f
-    val tireColor = Color(0xFF14171C)
-    val discColor = Color(0xFFCBD5E1)
-    val caliperColor = Color(0xFFEF4444)
-
     listOf(
-        Offset(left - wheelW * 0.55f, top + carH * 0.16f),
-        Offset(left + carW - wheelW * 0.45f, top + carH * 0.16f),
-        Offset(left - wheelW * 0.55f, top + carH * 0.64f),
-        Offset(left + carW - wheelW * 0.45f, top + carH * 0.64f)
+        Offset(left - wheelW * 0.5f, top + carH * 0.16f),
+        Offset(left + carW - wheelW * 0.5f, top + carH * 0.16f),
+        Offset(left - wheelW * 0.5f, top + carH * 0.64f),
+        Offset(left + carW - wheelW * 0.5f, top + carH * 0.64f)
     ).forEach { pos ->
-        // Tire rubber
         drawRoundRect(
-            color = tireColor,
+            color = Color(0xFF14171C),
             topLeft = pos,
             size = Size(wheelW, wheelH),
             cornerRadius = CornerRadius(6f, 6f)
         )
-        // Brake disc
-        drawCircle(
-            color = discColor,
-            radius = wheelW * 0.35f,
-            center = Offset(pos.x + wheelW * 0.5f, pos.y + wheelH * 0.5f)
-        )
-        // Brake Caliper
-        drawRoundRect(
-            color = caliperColor,
-            topLeft = Offset(pos.x + 2f, pos.y + wheelH * 0.22f),
-            size = Size(wheelW * 0.4f, wheelH * 0.25f),
-            cornerRadius = CornerRadius(2f, 2f)
-        )
-        // 5-Spoke Alloy Rim face
         drawCircle(
             color = Color(0xFF94A3B8),
-            radius = wheelW * 0.25f,
+            radius = wheelW * 0.3f,
             center = Offset(pos.x + wheelW * 0.5f, pos.y + wheelH * 0.5f)
         )
     }
 
-    // 3. Side Mirrors with Reflective Mirror Glass
-    val mirrorW = 12f
-    val mirrorH = 18f
-    // Left mirror
-    drawRoundRect(
-        color = Color(0xFF991B1B),
-        topLeft = Offset(left - mirrorW + 2f, top + carH * 0.26f),
-        size = Size(mirrorW, mirrorH),
-        cornerRadius = CornerRadius(4f, 4f)
-    )
-    drawRoundRect(
-        color = Color(0xFFE2E8F0),
-        topLeft = Offset(left - mirrorW + 4f, top + carH * 0.26f + 2f),
-        size = Size(3f, mirrorH - 4f),
-        cornerRadius = CornerRadius(2f, 2f)
-    )
-    // Right mirror
-    drawRoundRect(
-        color = Color(0xFF991B1B),
-        topLeft = Offset(left + carW - 2f, top + carH * 0.26f),
-        size = Size(mirrorW, mirrorH),
-        cornerRadius = CornerRadius(4f, 4f)
-    )
-    drawRoundRect(
-        color = Color(0xFFE2E8F0),
-        topLeft = Offset(left + carW + mirrorW - 7f, top + carH * 0.26f + 2f),
-        size = Size(3f, mirrorH - 4f),
-        cornerRadius = CornerRadius(2f, 2f)
-    )
-
-    // 4. Main Body: Metallic Crimson Multi-Stop Gradient
-    val bodyBrush = Brush.horizontalGradient(
+    // Lime Green Main Body
+    val bodyGradient = Brush.horizontalGradient(
         colors = listOf(
-            Color(0xFF7F1D1D),
-            Color(0xFFB91C1C),
-            Color(0xFFDC2626),
-            Color(0xFFEF4444),
-            Color(0xFFDC2626),
-            Color(0xFF991B1B),
-            Color(0xFF7F1D1D)
+            Color(0xFF4D7C0F), // Dark olive green edge
+            Color(0xFF84CC16), // Vibrant Lime Green
+            Color(0xFFA3E635), // Bright Highlight
+            Color(0xFF84CC16),
+            Color(0xFF4D7C0F)
         ),
         startX = left,
         endX = left + carW
     )
     drawRoundRect(
-        brush = bodyBrush,
+        brush = bodyGradient,
         topLeft = Offset(left, top),
         size = Size(carW, carH),
-        cornerRadius = CornerRadius(24f, 24f)
+        cornerRadius = CornerRadius(20f, 20f)
     )
 
-    // 5. Hood Sculpted Lines & Front Honeycomb Grille
-    // Sculpted lines
-    drawLine(
-        color = Color(0x40FFFFFF),
-        start = Offset(left + carW * 0.28f, top + 10f),
-        end = Offset(left + carW * 0.34f, top + carH * 0.28f),
-        strokeWidth = 2.5f
-    )
-    drawLine(
-        color = Color(0x40FFFFFF),
-        start = Offset(left + carW * 0.72f, top + 10f),
-        end = Offset(left + carW * 0.66f, top + carH * 0.28f),
-        strokeWidth = 2.5f
-    )
-    // Grille mesh
+    // Side Mirrors
     drawRoundRect(
-        color = Color(0xFF0F172A),
-        topLeft = Offset(left + carW * 0.32f, top + 2f),
-        size = Size(carW * 0.36f, 7f),
+        color = Color(0xFF65A30D),
+        topLeft = Offset(left - 7f, top + carH * 0.28f),
+        size = Size(8f, 15f),
+        cornerRadius = CornerRadius(3f, 3f)
+    )
+    drawRoundRect(
+        color = Color(0xFF65A30D),
+        topLeft = Offset(left + carW - 1f, top + carH * 0.28f),
+        size = Size(8f, 15f),
         cornerRadius = CornerRadius(3f, 3f)
     )
 
-    // 6. Curved Front Windshield + Black Ceramic Frit Border
-    val frontGlassTop = top + carH * 0.24f
-    val frontGlassH = carH * 0.19f
+    // Black Lightning Bolt Hood Accents (From user photo 3)
+    val lightningPathLeft = Path().apply {
+        moveTo(left + carW * 0.22f, top + carH * 0.08f)
+        lineTo(left + carW * 0.16f, top + carH * 0.24f)
+        lineTo(left + carW * 0.28f, top + carH * 0.22f)
+        lineTo(left + carW * 0.20f, top + carH * 0.38f)
+    }
+    drawPath(lightningPathLeft, color = Color(0xFF18181B), style = Stroke(width = 3.5f, cap = StrokeCap.Round))
 
-    // Frit border
-    val fritPath = Path().apply {
-        moveTo(left + carW * 0.14f, frontGlassTop + frontGlassH)
-        lineTo(left + carW * 0.22f, frontGlassTop)
-        lineTo(left + carW * 0.78f, frontGlassTop)
-        lineTo(left + carW * 0.86f, frontGlassTop + frontGlassH)
+    val lightningPathRight = Path().apply {
+        moveTo(left + carW * 0.78f, top + carH * 0.08f)
+        lineTo(left + carW * 0.84f, top + carH * 0.24f)
+        lineTo(left + carW * 0.72f, top + carH * 0.22f)
+        lineTo(left + carW * 0.80f, top + carH * 0.38f)
+    }
+    drawPath(lightningPathRight, color = Color(0xFF18181B), style = Stroke(width = 3.5f, cap = StrokeCap.Round))
+
+    // Windshield (Black / tinted)
+    val windshieldPath = Path().apply {
+        moveTo(left + carW * 0.20f, top + carH * 0.44f)
+        lineTo(left + carW * 0.26f, top + carH * 0.28f)
+        lineTo(left + carW * 0.74f, top + carH * 0.28f)
+        lineTo(left + carW * 0.80f, top + carH * 0.44f)
         close()
     }
-    drawPath(fritPath, color = Color(0xFF090D14))
+    drawPath(windshieldPath, color = Color(0xFF0F172A))
+    drawPath(windshieldPath, color = Color(0xFF334155), style = Stroke(width = 1.5f))
 
-    // Interior Cockpit Silhouette (Dashboard & Steering Wheel)
+    // Police Shield / Star Emblem on the front hood (Exact detail from user photo 3)
+    val badgeCenter = Offset(cx, top + carH * 0.20f)
+    drawCircle(color = Color(0xFF0F172A), radius = carW * 0.13f, center = badgeCenter)
+    drawCircle(color = Color(0xFFFACC15), radius = carW * 0.11f, center = badgeCenter, style = Stroke(width = 2f))
+    // 5-Point Golden Police Star
+    drawCircle(color = Color(0xFFFACC15), radius = carW * 0.05f, center = badgeCenter)
+
+    // Roof & Rear Window
     drawRoundRect(
-        color = Color(0xFF1E293B),
-        topLeft = Offset(left + carW * 0.22f, frontGlassTop + 6f),
-        size = Size(carW * 0.56f, 10f),
-        cornerRadius = CornerRadius(4f, 4f)
-    )
-    // Steering Wheel circle
-    drawCircle(
-        color = Color(0xFF475569),
-        radius = 7f,
-        center = Offset(left + carW * 0.35f, frontGlassTop + 14f),
-        style = Stroke(width = 2.5f)
-    )
-
-    // Glass glare diagonal streak
-    drawLine(
-        color = Color(0x3560A5FA),
-        start = Offset(left + carW * 0.28f, frontGlassTop + 4f),
-        end = Offset(left + carW * 0.44f, frontGlassTop + frontGlassH - 4f),
-        strokeWidth = 4f,
-        cap = StrokeCap.Round
-    )
-
-    // Two Windshield Wipers
-    drawLine(
-        color = Color(0xFF000000),
-        start = Offset(left + carW * 0.30f, frontGlassTop + frontGlassH - 2f),
-        end = Offset(left + carW * 0.48f, frontGlassTop + frontGlassH - 6f),
-        strokeWidth = 2f
-    )
-    drawLine(
-        color = Color(0xFF000000),
-        start = Offset(left + carW * 0.52f, frontGlassTop + frontGlassH - 2f),
-        end = Offset(left + carW * 0.70f, frontGlassTop + frontGlassH - 6f),
-        strokeWidth = 2f
-    )
-
-    // 7. Panoramic Dark Glass Sunroof
-    drawRoundRect(
-        color = Color(0xFF0B1320),
+        color = Color(0xFF0F172A),
         topLeft = Offset(left + carW * 0.24f, top + carH * 0.46f),
-        size = Size(carW * 0.52f, carH * 0.20f),
-        cornerRadius = CornerRadius(8f, 8f)
+        size = Size(carW * 0.52f, carH * 0.24f),
+        cornerRadius = CornerRadius(6f, 6f)
     )
-    // Roof Shark Fin Antenna
+
+    // "POLICE" White/Yellow Stencil Text Badge on Roof
     drawRoundRect(
-        color = Color(0xFF18181B),
-        topLeft = Offset(left + carW * 0.48f, top + carH * 0.64f),
-        size = Size(carW * 0.04f, 10f),
+        color = Color(0xFFF8FAFC),
+        topLeft = Offset(cx - carW * 0.22f, top + carH * 0.54f),
+        size = Size(carW * 0.44f, carH * 0.08f),
+        cornerRadius = CornerRadius(3f, 3f)
+    )
+    drawRoundRect(
+        color = Color(0xFF0F172A),
+        topLeft = Offset(cx - carW * 0.20f, top + carH * 0.555f),
+        size = Size(carW * 0.40f, carH * 0.05f),
         cornerRadius = CornerRadius(2f, 2f)
     )
 
-    // 8. Rear Windshield with Defroster Lines
-    val rearGlassTop = top + carH * 0.67f
-    val rearGlassH = carH * 0.14f
-    val rearGlassPath = Path().apply {
-        moveTo(left + carW * 0.20f, rearGlassTop)
-        lineTo(left + carW * 0.80f, rearGlassTop)
-        lineTo(left + carW * 0.84f, rearGlassTop + rearGlassH)
-        lineTo(left + carW * 0.16f, rearGlassTop + rearGlassH)
+    // Rear Windshield
+    val rearGlass = Path().apply {
+        moveTo(left + carW * 0.24f, top + carH * 0.72f)
+        lineTo(left + carW * 0.76f, top + carH * 0.72f)
+        lineTo(left + carW * 0.80f, top + carH * 0.84f)
+        lineTo(left + carW * 0.20f, top + carH * 0.84f)
         close()
     }
-    drawPath(rearGlassPath, color = Color(0xFF0B1320))
-    // Defroster lines
-    for (i in 1..2) {
-        val lineY = rearGlassTop + (rearGlassH / 3f) * i
-        drawLine(
-            color = Color(0x33F59E0B),
-            start = Offset(left + carW * 0.22f, lineY),
-            end = Offset(left + carW * 0.78f, lineY),
-            strokeWidth = 1f
-        )
-    }
+    drawPath(rearGlass, color = Color(0xFF0F172A))
 
-    // 9. Rear Carbon Lip Spoiler & Exhaust Tips
+    // Headlights (Twin white headlights with pulse)
     drawRoundRect(
-        color = Color(0xFF18181B),
-        topLeft = Offset(left + carW * 0.16f, top + carH - 9f),
-        size = Size(carW * 0.68f, 6f),
-        cornerRadius = CornerRadius(3f, 3f)
+        color = Color(0xFFFFFFFF),
+        topLeft = Offset(left + carW * 0.14f, top + 3f),
+        size = Size(carW * 0.20f, 6f),
+        cornerRadius = CornerRadius(2f, 2f)
     )
-    // Dual chrome exhaust tips
-    drawCircle(color = Color(0xFFE2E8F0), radius = 3.5f, center = Offset(left + carW * 0.26f, top + carH - 1f))
-    drawCircle(color = Color(0xFF0F172A), radius = 2f, center = Offset(left + carW * 0.26f, top + carH - 1f))
-    drawCircle(color = Color(0xFFE2E8F0), radius = 3.5f, center = Offset(left + carW * 0.74f, top + carH - 1f))
-    drawCircle(color = Color(0xFF0F172A), radius = 2f, center = Offset(left + carW * 0.74f, top + carH - 1f))
-
-    // 10. Projector Headlights with Dual Optics & Amber Turn Signals
-    val hlWidth = carW * 0.20f
-    val hlHeight = 8f
-    listOf(
-        Offset(left + carW * 0.10f, top + 4f),
-        Offset(left + carW * 0.70f, top + 4f)
-    ).forEach { hlPos ->
-        // Headlight housing
-        drawRoundRect(
-            color = Color(0xFF1E293B),
-            topLeft = hlPos,
-            size = Size(hlWidth, hlHeight),
-            cornerRadius = CornerRadius(4f, 4f)
-        )
-        // Projector dual LED bulbs
-        drawCircle(color = Color.White, radius = 2.5f, center = Offset(hlPos.x + hlWidth * 0.35f, hlPos.y + 4f))
-        drawCircle(color = Color.White, radius = 2.5f, center = Offset(hlPos.x + hlWidth * 0.70f, hlPos.y + 4f))
-        // Amber corner
-        drawRoundRect(
-            color = Color(0xFFF59E0B),
-            topLeft = Offset(hlPos.x + 2f, hlPos.y + 1f),
-            size = Size(3f, hlHeight - 2f),
-            cornerRadius = CornerRadius(1f, 1f)
-        )
-    }
-
-    // Light Beam on Road
-    if (progress > 0.4f) {
-        val beamAlpha = 0.35f * pulse * progress
-        val beamBrush = Brush.verticalGradient(
-            colors = listOf(Color(0xFF38BDF8).copy(alpha = beamAlpha), Color.Transparent),
-            startY = top + 4f,
-            endY = top - 45f
-        )
-        drawCircle(brush = beamBrush, radius = 26f, center = Offset(left + carW * 0.20f, top - 10f))
-        drawCircle(brush = beamBrush, radius = 26f, center = Offset(left + carW * 0.80f, top - 10f))
-    }
-
-    // Rear Taillight Continuous LED Bar
     drawRoundRect(
-        color = Color(0xFFFF1A1A),
-        topLeft = Offset(left + carW * 0.14f, top + carH - 5f),
-        size = Size(carW * 0.72f, 4f),
+        color = Color(0xFFFFFFFF),
+        topLeft = Offset(left + carW * 0.66f, top + 3f),
+        size = Size(carW * 0.20f, 6f),
+        cornerRadius = CornerRadius(2f, 2f)
+    )
+
+    // Taillights (Red)
+    drawRoundRect(
+        color = Color(0xFFEF4444),
+        topLeft = Offset(left + carW * 0.16f, top + carH - 5f),
+        size = Size(carW * 0.22f, 4f),
+        cornerRadius = CornerRadius(2f, 2f)
+    )
+    drawRoundRect(
+        color = Color(0xFFEF4444),
+        topLeft = Offset(left + carW * 0.62f, top + carH - 5f),
+        size = Size(carW * 0.22f, 4f),
         cornerRadius = CornerRadius(2f, 2f)
     )
 }
 
-// -------------------------------------------------------------
-// 2. MIDNIGHT SAPPHIRE LUXURY SUV
-// -------------------------------------------------------------
-private fun DrawScope.drawPhotorealisticSuv(w: Float, h: Float, pulse: Float, progress: Float) {
-    val carW = w * 0.65f // Broad muscular stance
-    val carH = h * 0.86f
+// -----------------------------------------------------------------------------------------
+// 2. SLOT 2: LIME GREEN SPORTS GT COUPE (Matching User's Slot 2 Car in Photo 2 & 4)
+// -----------------------------------------------------------------------------------------
+private fun DrawScope.drawLimeGreenSportsCoupe(w: Float, h: Float, pulse: Float, progress: Float) {
+    val carW = w * 0.62f
+    val carH = h * 0.84f
     val cx = w / 2f
     val cy = h / 2f + (1f - progress) * 8f
     val left = cx - carW / 2f
     val top = cy - carH / 2f
 
-    // 1. Shadows
+    // Ground Shadow
     drawRoundRect(
-        color = Color(0x33000000),
-        topLeft = Offset(left - 9f, top + 9f),
-        size = Size(carW + 18f, carH + 14f),
-        cornerRadius = CornerRadius(28f, 28f)
-    )
-    drawRoundRect(
-        color = Color(0x77000000),
-        topLeft = Offset(left - 3f, top + 4f),
-        size = Size(carW + 6f, carH + 6f),
-        cornerRadius = CornerRadius(24f, 24f)
+        color = Color(0x38000000),
+        topLeft = Offset(left - 6f, top + 8f),
+        size = Size(carW + 12f, carH + 12f),
+        cornerRadius = CornerRadius(22f, 22f)
     )
 
-    // 2. Rugged All-Terrain Wheels with Gold Calipers
-    val wheelW = carW * 0.17f
-    val wheelH = carH * 0.24f
+    // 4 Wheels
+    val wheelW = carW * 0.16f
+    val wheelH = carH * 0.22f
     listOf(
-        Offset(left - wheelW * 0.50f, top + carH * 0.16f),
-        Offset(left + carW - wheelW * 0.50f, top + carH * 0.16f),
-        Offset(left - wheelW * 0.50f, top + carH * 0.65f),
-        Offset(left + carW - wheelW * 0.50f, top + carH * 0.65f)
+        Offset(left - wheelW * 0.5f, top + carH * 0.16f),
+        Offset(left + carW - wheelW * 0.5f, top + carH * 0.16f),
+        Offset(left - wheelW * 0.5f, top + carH * 0.64f),
+        Offset(left + carW - wheelW * 0.5f, top + carH * 0.64f)
     ).forEach { pos ->
-        // Deep black tread rubber
         drawRoundRect(
-            color = Color(0xFF111418),
+            color = Color(0xFF14171C),
             topLeft = pos,
             size = Size(wheelW, wheelH),
-            cornerRadius = CornerRadius(7f, 7f)
+            cornerRadius = CornerRadius(6f, 6f)
         )
-        // Silver multi-spoke rim
         drawCircle(
-            color = Color(0xFF64748B),
-            radius = wheelW * 0.38f,
+            color = Color(0xFF94A3B8),
+            radius = wheelW * 0.3f,
             center = Offset(pos.x + wheelW * 0.5f, pos.y + wheelH * 0.5f)
-        )
-        // Gold brake caliper
-        drawRoundRect(
-            color = Color(0xFFEAB308),
-            topLeft = Offset(pos.x + 3f, pos.y + wheelH * 0.25f),
-            size = Size(wheelW * 0.35f, wheelH * 0.25f),
-            cornerRadius = CornerRadius(2f, 2f)
         )
     }
 
-    // 3. Side Mirrors
-    val mirrorW = 13f
-    val mirrorH = 20f
-    drawRoundRect(
-        color = Color(0xFF1E3A8A),
-        topLeft = Offset(left - mirrorW + 2f, top + carH * 0.24f),
-        size = Size(mirrorW, mirrorH),
-        cornerRadius = CornerRadius(4f, 4f)
-    )
-    drawRoundRect(
-        color = Color(0xFF1E3A8A),
-        topLeft = Offset(left + carW - 2f, top + carH * 0.24f),
-        size = Size(mirrorW, mirrorH),
-        cornerRadius = CornerRadius(4f, 4f)
-    )
-
-    // 4. Muscular SUV Body: Sapphire Metallic Gradient
-    val bodyBrush = Brush.horizontalGradient(
+    // Lime Green Body (Vibrant Apple / Lime Sport finish)
+    val bodyGradient = Brush.horizontalGradient(
         colors = listOf(
-            Color(0xFF172554),
-            Color(0xFF1E3A8A),
-            Color(0xFF2563EB),
-            Color(0xFF3B82F6),
-            Color(0xFF2563EB),
-            Color(0xFF1D4ED8),
-            Color(0xFF172554)
+            Color(0xFF65A30D),
+            Color(0xFFA3E635),
+            Color(0xFFBEF264),
+            Color(0xFFA3E635),
+            Color(0xFF65A30D)
         ),
         startX = left,
         endX = left + carW
     )
     drawRoundRect(
-        brush = bodyBrush,
+        brush = bodyGradient,
         topLeft = Offset(left, top),
         size = Size(carW, carH),
-        cornerRadius = CornerRadius(26f, 26f)
+        cornerRadius = CornerRadius(22f, 22f)
     )
 
-    // 5. Dual Silver Roof Rails
-    val railColor = Color(0xFFE2E8F0)
+    // Aerodynamic Hood Creases & Air Vent
+    drawLine(
+        color = Color(0xFF4D7C0F),
+        start = Offset(left + carW * 0.30f, top + carH * 0.08f),
+        end = Offset(left + carW * 0.34f, top + carH * 0.28f),
+        strokeWidth = 2.5f
+    )
+    drawLine(
+        color = Color(0xFF4D7C0F),
+        start = Offset(left + carW * 0.70f, top + carH * 0.08f),
+        end = Offset(left + carW * 0.66f, top + carH * 0.28f),
+        strokeWidth = 2.5f
+    )
+    // Central Sport Hood Scoop
     drawRoundRect(
-        color = railColor,
-        topLeft = Offset(left + carW * 0.15f, top + carH * 0.28f),
-        size = Size(5f, carH * 0.48f),
+        color = Color(0xFF365314),
+        topLeft = Offset(cx - carW * 0.14f, top + carH * 0.14f),
+        size = Size(carW * 0.28f, carH * 0.08f),
+        cornerRadius = CornerRadius(3f, 3f)
+    )
+
+    // Side Mirrors
+    drawRoundRect(
+        color = Color(0xFF65A30D),
+        topLeft = Offset(left - 7f, top + carH * 0.30f),
+        size = Size(8f, 15f),
         cornerRadius = CornerRadius(3f, 3f)
     )
     drawRoundRect(
-        color = railColor,
-        topLeft = Offset(left + carW * 0.85f - 5f, top + carH * 0.28f),
-        size = Size(5f, carH * 0.48f),
+        color = Color(0xFF65A30D),
+        topLeft = Offset(left + carW - 1f, top + carH * 0.30f),
+        size = Size(8f, 15f),
         cornerRadius = CornerRadius(3f, 3f)
     )
 
-    // 6. Windshield with Cockpit & Dual Wipers
-    val frontGlassTop = top + carH * 0.22f
-    val frontGlassH = carH * 0.19f
-    val fritPath = Path().apply {
-        moveTo(left + carW * 0.14f, frontGlassTop + frontGlassH)
-        lineTo(left + carW * 0.20f, frontGlassTop)
-        lineTo(left + carW * 0.80f, frontGlassTop)
-        lineTo(left + carW * 0.86f, frontGlassTop + frontGlassH)
+    // Cockpit Curved Windshield
+    val windshieldPath = Path().apply {
+        moveTo(left + carW * 0.18f, top + carH * 0.44f)
+        lineTo(left + carW * 0.24f, top + carH * 0.28f)
+        lineTo(left + carW * 0.76f, top + carH * 0.28f)
+        lineTo(left + carW * 0.82f, top + carH * 0.44f)
         close()
     }
-    drawPath(fritPath, color = Color(0xFF090D14))
+    drawPath(windshieldPath, color = Color(0xFF0F172A))
+    drawPath(windshieldPath, color = Color(0xFF334155), style = Stroke(width = 1.5f))
 
-    // Interior steering wheel
-    drawCircle(
-        color = Color(0xFF475569),
-        radius = 8f,
-        center = Offset(left + carW * 0.35f, frontGlassTop + 13f),
-        style = Stroke(width = 2.5f)
-    )
-
-    // Dual Sunroof Glass Panes
-    drawRoundRect(
-        color = Color(0xFF0F172A),
-        topLeft = Offset(left + carW * 0.25f, top + carH * 0.44f),
-        size = Size(carW * 0.50f, carH * 0.12f),
-        cornerRadius = CornerRadius(6f, 6f)
-    )
-    drawRoundRect(
-        color = Color(0xFF0F172A),
-        topLeft = Offset(left + carW * 0.25f, top + carH * 0.58f),
-        size = Size(carW * 0.50f, carH * 0.09f),
-        cornerRadius = CornerRadius(6f, 6f)
-    )
-
-    // Upright SUV Rear Glass
-    drawRoundRect(
-        color = Color(0xFF090D14),
-        topLeft = Offset(left + carW * 0.18f, top + carH * 0.70f),
-        size = Size(carW * 0.64f, carH * 0.13f),
-        cornerRadius = CornerRadius(6f, 6f)
-    )
-
-    // Rear Roof Spoiler with Center High Brake Light
+    // Roof Panel
     drawRoundRect(
         color = Color(0xFF1E293B),
-        topLeft = Offset(left + carW * 0.16f, top + carH * 0.69f),
-        size = Size(carW * 0.68f, 5f),
+        topLeft = Offset(left + carW * 0.24f, top + carH * 0.46f),
+        size = Size(carW * 0.52f, carH * 0.22f),
+        cornerRadius = CornerRadius(6f, 6f)
+    )
+
+    // Fastback Rear Glass
+    val rearGlass = Path().apply {
+        moveTo(left + carW * 0.22f, top + carH * 0.70f)
+        lineTo(left + carW * 0.78f, top + carH * 0.70f)
+        lineTo(left + carW * 0.82f, top + carH * 0.84f)
+        lineTo(left + carW * 0.18f, top + carH * 0.84f)
+        close()
+    }
+    drawPath(rearGlass, color = Color(0xFF0F172A))
+
+    // Rear GT Spoiler Wing
+    drawRoundRect(
+        color = Color(0xFF1E293B),
+        topLeft = Offset(left + carW * 0.08f, top + carH * 0.90f),
+        size = Size(carW * 0.84f, 6f),
+        cornerRadius = CornerRadius(3f, 3f)
+    )
+
+    // Headlights
+    drawRoundRect(
+        color = Color(0xFFFFFFFF),
+        topLeft = Offset(left + carW * 0.12f, top + 4f),
+        size = Size(carW * 0.22f, 6f),
         cornerRadius = CornerRadius(2f, 2f)
     )
     drawRoundRect(
-        color = Color(0xFFFF1A1A),
-        topLeft = Offset(left + carW * 0.42f, top + carH * 0.69f),
-        size = Size(carW * 0.16f, 3f),
-        cornerRadius = CornerRadius(1.5f, 1.5f)
-    )
-
-    // Quad Projector LED Headlights
-    listOf(
-        Offset(left + carW * 0.10f, top + 4f),
-        Offset(left + carW * 0.68f, top + 4f)
-    ).forEach { hlPos ->
-        drawRoundRect(
-            color = Color(0xFF1E293B),
-            topLeft = hlPos,
-            size = Size(carW * 0.22f, 8f),
-            cornerRadius = CornerRadius(4f, 4f)
-        )
-        drawCircle(color = Color.White, radius = 2.5f, center = Offset(hlPos.x + 6f, hlPos.y + 4f))
-        drawCircle(color = Color.White, radius = 2.5f, center = Offset(hlPos.x + 14f, hlPos.y + 4f))
-    }
-
-    // Headlight Light Beam Cone
-    if (progress > 0.4f) {
-        val beamAlpha = 0.38f * pulse * progress
-        val beamBrush = Brush.verticalGradient(
-            colors = listOf(Color(0xFF60A5FA).copy(alpha = beamAlpha), Color.Transparent),
-            startY = top + 4f,
-            endY = top - 45f
-        )
-        drawCircle(brush = beamBrush, radius = 28f, center = Offset(left + carW * 0.21f, top - 10f))
-        drawCircle(brush = beamBrush, radius = 28f, center = Offset(left + carW * 0.79f, top - 10f))
-    }
-
-    // Rear Taillights
-    drawRoundRect(
-        color = Color(0xFFEF4444),
-        topLeft = Offset(left + carW * 0.12f, top + carH - 6f),
-        size = Size(carW * 0.24f, 5f),
+        color = Color(0xFFFFFFFF),
+        topLeft = Offset(left + carW * 0.66f, top + 4f),
+        size = Size(carW * 0.22f, 6f),
         cornerRadius = CornerRadius(2f, 2f)
     )
+
+    // Taillights
     drawRoundRect(
         color = Color(0xFFEF4444),
-        topLeft = Offset(left + carW * 0.64f, top + carH - 6f),
-        size = Size(carW * 0.24f, 5f),
+        topLeft = Offset(left + carW * 0.14f, top + carH - 4f),
+        size = Size(carW * 0.72f, 3.5f),
         cornerRadius = CornerRadius(2f, 2f)
     )
 }
 
-// -------------------------------------------------------------
-// 3. CYBER AMBER PERFORMANCE GT COUPE
-// -------------------------------------------------------------
-private fun DrawScope.drawPhotorealisticGtCoupe(w: Float, h: Float, pulse: Float, progress: Float) {
-    val carW = w * 0.61f
+// -----------------------------------------------------------------------------------------
+// 3. SLOT 3: VINTAGE RED CLASSIC BEETLE COUPE (Matching User's Red Car in Photo 1 & 4)
+// -----------------------------------------------------------------------------------------
+private fun DrawScope.drawVintageRedClassicBeetle(w: Float, h: Float, pulse: Float, progress: Float) {
+    val carW = w * 0.60f
     val carH = h * 0.82f
     val cx = w / 2f
     val cy = h / 2f + (1f - progress) * 8f
     val left = cx - carW / 2f
     val top = cy - carH / 2f
 
-    // 1. Shadows
-    drawRoundRect(
-        color = Color(0x33000000),
-        topLeft = Offset(left - 8f, top + 8f),
-        size = Size(carW + 16f, carH + 12f),
-        cornerRadius = CornerRadius(24f, 24f)
-    )
-    drawRoundRect(
-        color = Color(0x77000000),
-        topLeft = Offset(left - 3f, top + 4f),
-        size = Size(carW + 6f, carH + 6f),
-        cornerRadius = CornerRadius(22f, 22f)
+    // Ground Shadow (Rounded vintage shadow)
+    drawOval(
+        color = Color(0x40000000),
+        topLeft = Offset(left - 8f, top + 6f),
+        size = Size(carW + 16f, carH + 10f)
     )
 
-    // 2. Wide Racing Wheels with Bronze Rims & Red Brembo Calipers
-    val wheelW = carW * 0.18f
-    val wheelH = carH * 0.23f
+    // 4 Vintage Wheels with Chrome Hubcaps
+    val wheelW = carW * 0.15f
+    val wheelH = carH * 0.20f
     listOf(
-        Offset(left - wheelW * 0.55f, top + carH * 0.17f),
-        Offset(left + carW - wheelW * 0.45f, top + carH * 0.17f),
-        Offset(left - wheelW * 0.55f, top + carH * 0.63f),
-        Offset(left + carW - wheelW * 0.45f, top + carH * 0.63f)
+        Offset(left - wheelW * 0.45f, top + carH * 0.18f),
+        Offset(left + carW - wheelW * 0.55f, top + carH * 0.18f),
+        Offset(left - wheelW * 0.45f, top + carH * 0.66f),
+        Offset(left + carW - wheelW * 0.55f, top + carH * 0.66f)
     ).forEach { pos ->
         drawRoundRect(
-            color = Color(0xFF14171A),
+            color = Color(0xFF18181B),
             topLeft = pos,
             size = Size(wheelW, wheelH),
-            cornerRadius = CornerRadius(6f, 6f)
+            cornerRadius = CornerRadius(5f, 5f)
         )
-        // Bronze Rim
+        // Vintage Chrome Hubcap
         drawCircle(
-            color = Color(0xFFD97706),
+            color = Color(0xFFE2E8F0),
             radius = wheelW * 0.35f,
             center = Offset(pos.x + wheelW * 0.5f, pos.y + wheelH * 0.5f)
         )
-        // Red Brembo Caliper
-        drawRoundRect(
-            color = Color(0xFFEF4444),
-            topLeft = Offset(pos.x + 2f, pos.y + wheelH * 0.25f),
-            size = Size(wheelW * 0.4f, wheelH * 0.25f),
-            cornerRadius = CornerRadius(2f, 2f)
-        )
     }
 
-    // 3. Black Racing Mirrors
-    val mirrorW = 11f
-    val mirrorH = 16f
-    drawRoundRect(
-        color = Color(0xFF18181B),
-        topLeft = Offset(left - mirrorW + 2f, top + carH * 0.28f),
-        size = Size(mirrorW, mirrorH),
-        cornerRadius = CornerRadius(3f, 3f)
-    )
-    drawRoundRect(
-        color = Color(0xFF18181B),
-        topLeft = Offset(left + carW - 2f, top + carH * 0.28f),
-        size = Size(mirrorW, mirrorH),
-        cornerRadius = CornerRadius(3f, 3f)
+    // Wide Curving Fenders (Characteristic of the user's vintage beetle model)
+    val fenderGradient = Brush.horizontalGradient(
+        colors = listOf(
+            Color(0xFF7F1D1D),
+            Color(0xFFDC2626),
+            Color(0xFFEF4444),
+            Color(0xFFDC2626),
+            Color(0xFF7F1D1D)
+        ),
+        startX = left - 4f,
+        endX = left + carW + 4f
     )
 
-    // 4. Aggressive Aerodynamic Body: Cyber Amber / Pearl Gold
-    val bodyBrush = Brush.horizontalGradient(
-        colors = listOf(
-            Color(0xFFB45309),
-            Color(0xFFD97706),
-            Color(0xFFF59E0B),
-            Color(0xFFFDE047),
-            Color(0xFFF59E0B),
-            Color(0xFFD97706),
-            Color(0xFFB45309)
-        ),
-        startX = left,
-        endX = left + carW
-    )
+    // Front Fenders (Rounded)
     drawRoundRect(
-        brush = bodyBrush,
+        brush = fenderGradient,
+        topLeft = Offset(left - 4f, top + carH * 0.10f),
+        size = Size(carW + 8f, carH * 0.30f),
+        cornerRadius = CornerRadius(18f, 18f)
+    )
+
+    // Rear Fenders (Prominently wide & bulbous as seen in photo 1)
+    drawRoundRect(
+        brush = fenderGradient,
+        topLeft = Offset(left - 5f, top + carH * 0.58f),
+        size = Size(carW + 10f, carH * 0.34f),
+        cornerRadius = CornerRadius(20f, 20f)
+    )
+
+    // Main Rounded Cabin Shell
+    drawRoundRect(
+        brush = fenderGradient,
         topLeft = Offset(left, top),
         size = Size(carW, carH),
-        cornerRadius = CornerRadius(24f, 24f)
+        cornerRadius = CornerRadius(26f, 26f)
     )
 
-    // 5. Dual Carbon Fiber Hood Heat Extractor Vents
+    // Vintage Chrome Front Bumper Bar
     drawRoundRect(
-        color = Color(0xFF18181B),
-        topLeft = Offset(left + carW * 0.30f, top + carH * 0.12f),
-        size = Size(carW * 0.14f, carH * 0.10f),
-        cornerRadius = CornerRadius(3f, 3f)
-    )
-    drawRoundRect(
-        color = Color(0xFF18181B),
-        topLeft = Offset(left + carW * 0.56f, top + carH * 0.12f),
-        size = Size(carW * 0.14f, carH * 0.10f),
-        cornerRadius = CornerRadius(3f, 3f)
-    )
-
-    // 6. Fastback Windshield with Steering Wheel
-    val frontGlassTop = top + carH * 0.26f
-    val frontGlassH = carH * 0.20f
-    val fritPath = Path().apply {
-        moveTo(left + carW * 0.14f, frontGlassTop + frontGlassH)
-        lineTo(left + carW * 0.24f, frontGlassTop)
-        lineTo(left + carW * 0.76f, frontGlassTop)
-        lineTo(left + carW * 0.86f, frontGlassTop + frontGlassH)
-        close()
-    }
-    drawPath(fritPath, color = Color(0xFF090D14))
-
-    // Sport steering wheel
-    drawCircle(
-        color = Color(0xFF64748B),
-        radius = 7.5f,
-        center = Offset(left + carW * 0.35f, frontGlassTop + 14f),
-        style = Stroke(width = 2.5f)
-    )
-
-    // Carbon Fiber Roof Panel
-    drawRoundRect(
-        color = Color(0xFF141416),
-        topLeft = Offset(left + carW * 0.24f, top + carH * 0.48f),
-        size = Size(carW * 0.52f, carH * 0.18f),
-        cornerRadius = CornerRadius(6f, 6f)
-    )
-
-    // Fastback Rear Window
-    val rearGlassTop = top + carH * 0.66f
-    val rearGlassH = carH * 0.14f
-    val rearGlassPath = Path().apply {
-        moveTo(left + carW * 0.22f, rearGlassTop)
-        lineTo(left + carW * 0.78f, rearGlassTop)
-        lineTo(left + carW * 0.82f, rearGlassTop + rearGlassH)
-        lineTo(left + carW * 0.18f, rearGlassTop + rearGlassH)
-        close()
-    }
-    drawPath(rearGlassPath, color = Color(0xFF090D14))
-
-    // 7. Prominent Carbon GT Rear Wing with Stanchions
-    // Wing Stanchions
-    drawRect(color = Color(0xFF27272A), topLeft = Offset(left + carW * 0.28f, top + carH - 16f), size = Size(4f, 10f))
-    drawRect(color = Color(0xFF27272A), topLeft = Offset(left + carW * 0.68f, top + carH - 16f), size = Size(4f, 10f))
-    // Wing Blade
-    drawRoundRect(
-        color = Color(0xFF09090B),
-        topLeft = Offset(left + carW * 0.08f, top + carH - 16f),
-        size = Size(carW * 0.84f, 7f),
-        cornerRadius = CornerRadius(3f, 3f)
-    )
-
-    // 8. Laser Headlights with Optics
-    listOf(
-        Offset(left + carW * 0.12f, top + 4f),
-        Offset(left + carW * 0.68f, top + 4f)
-    ).forEach { hlPos ->
-        drawRoundRect(
-            color = Color(0xFF18181B),
-            topLeft = hlPos,
-            size = Size(carW * 0.20f, 7f),
-            cornerRadius = CornerRadius(3f, 3f)
-        )
-        drawCircle(color = Color.White, radius = 2.5f, center = Offset(hlPos.x + 6f, hlPos.y + 3.5f))
-        drawCircle(color = Color.White, radius = 2.5f, center = Offset(hlPos.x + 13f, hlPos.y + 3.5f))
-    }
-
-    // Light Beam
-    if (progress > 0.4f) {
-        val beamAlpha = 0.40f * pulse * progress
-        val beamBrush = Brush.verticalGradient(
-            colors = listOf(Color(0xFFFDE047).copy(alpha = beamAlpha), Color.Transparent),
-            startY = top + 4f,
-            endY = top - 45f
-        )
-        drawCircle(brush = beamBrush, radius = 26f, center = Offset(left + carW * 0.22f, top - 10f))
-        drawCircle(brush = beamBrush, radius = 26f, center = Offset(left + carW * 0.78f, top - 10f))
-    }
-
-    // Taillights
-    drawRoundRect(
-        color = Color(0xFFEF4444),
-        topLeft = Offset(left + carW * 0.15f, top + carH - 6f),
-        size = Size(carW * 0.70f, 4f),
+        color = Color(0xFFE2E8F0),
+        topLeft = Offset(left + carW * 0.10f, top - 2f),
+        size = Size(carW * 0.80f, 5f),
         cornerRadius = CornerRadius(2f, 2f)
+    )
+
+    // Vintage Round Headlights (Bullet style)
+    drawCircle(
+        color = Color(0xFFFFFFFF),
+        radius = carW * 0.11f,
+        center = Offset(left + carW * 0.22f, top + 6f)
+    )
+    drawCircle(
+        color = Color(0xFF94A3B8),
+        radius = carW * 0.11f,
+        center = Offset(left + carW * 0.22f, top + 6f),
+        style = Stroke(width = 1.5f)
+    )
+    drawCircle(
+        color = Color(0xFFFFFFFF),
+        radius = carW * 0.11f,
+        center = Offset(left + carW * 0.78f, top + 6f)
+    )
+    drawCircle(
+        color = Color(0xFF94A3B8),
+        radius = carW * 0.11f,
+        center = Offset(left + carW * 0.78f, top + 6f),
+        style = Stroke(width = 1.5f)
+    )
+
+    // Rounded Beetle Hood Ridge Line
+    drawLine(
+        color = Color(0xFF7F1D1D),
+        start = Offset(cx, top + 4f),
+        end = Offset(cx, top + carH * 0.32f),
+        strokeWidth = 2f
+    )
+
+    // Split Windshield (Classic vintage rounded curve)
+    val vintageWindshield = Path().apply {
+        moveTo(left + carW * 0.16f, top + carH * 0.44f)
+        lineTo(left + carW * 0.24f, top + carH * 0.30f)
+        lineTo(left + carW * 0.76f, top + carH * 0.30f)
+        lineTo(left + carW * 0.84f, top + carH * 0.44f)
+        close()
+    }
+    drawPath(vintageWindshield, color = Color(0xFF0F172A))
+    drawPath(vintageWindshield, color = Color(0xFFCBD5E1), style = Stroke(width = 1.5f))
+    // Center divider post
+    drawLine(
+        color = Color(0xFFDC2626),
+        start = Offset(cx, top + carH * 0.30f),
+        end = Offset(cx, top + carH * 0.44f),
+        strokeWidth = 3f
+    )
+
+    // Rounded Oval Roof Top
+    drawRoundRect(
+        color = Color(0xFFB91C1C),
+        topLeft = Offset(left + carW * 0.22f, top + carH * 0.46f),
+        size = Size(carW * 0.56f, carH * 0.22f),
+        cornerRadius = CornerRadius(12f, 12f)
+    )
+
+    // Small Oval Rear Window (Classic VW Beetle split oval glass)
+    drawOval(
+        color = Color(0xFF0F172A),
+        topLeft = Offset(cx - carW * 0.18f, top + carH * 0.70f),
+        size = Size(carW * 0.36f, carH * 0.10f)
+    )
+    drawOval(
+        color = Color(0xFFCBD5E1),
+        topLeft = Offset(cx - carW * 0.18f, top + carH * 0.70f),
+        size = Size(carW * 0.36f, carH * 0.10f),
+        style = Stroke(width = 1.5f)
+    )
+
+    // Vintage Chrome Rear Bumper Bar & Round Taillights
+    drawRoundRect(
+        color = Color(0xFFE2E8F0),
+        topLeft = Offset(left + carW * 0.10f, top + carH - 3f),
+        size = Size(carW * 0.80f, 5f),
+        cornerRadius = CornerRadius(2f, 2f)
+    )
+    drawCircle(
+        color = Color(0xFFEF4444),
+        radius = carW * 0.08f,
+        center = Offset(left + carW * 0.20f, top + carH - 6f)
+    )
+    drawCircle(
+        color = Color(0xFFEF4444),
+        radius = carW * 0.08f,
+        center = Offset(left + carW * 0.80f, top + carH - 6f)
     )
 }

@@ -67,7 +67,12 @@ class GatewaySyncManager {
                 val mediaType = "application/json; charset=utf-8".toMediaType()
                 val body = payload.toString().toRequestBody(mediaType)
 
-                val targetUrl = currentConfig.endpointUrl.ifBlank { DEFAULT_FIREBASE_URL }
+                val rawUrl = currentConfig.endpointUrl.ifBlank { DEFAULT_FIREBASE_URL }.trim()
+                val targetUrl = when {
+                    rawUrl.endsWith(".json") -> rawUrl
+                    rawUrl.endsWith("/") -> "${rawUrl}parking_live.json"
+                    else -> "$rawUrl/parking_live.json"
+                }
                 val request = Request.Builder()
                     .url(targetUrl)
                     .put(body) // Firebase Realtime DB REST accepts PUT to overwrite root object
@@ -125,15 +130,15 @@ class GatewaySyncManager {
             put("slots", JSONObject().apply {
                 put("s1", JSONObject().apply {
                     put("occupied", state.slot1)
-                    put("car", if (state.slot1) "Crimson Sport Sedan" else "Empty")
+                    put("car", if (state.slot1) "Lime Green Police Cruiser" else "Empty")
                 })
                 put("s2", JSONObject().apply {
                     put("occupied", state.slot2)
-                    put("car", if (state.slot2) "Midnight Blue SUV" else "Empty")
+                    put("car", if (state.slot2) "Lime Green Sports GT Coupe" else "Empty")
                 })
                 put("s3", JSONObject().apply {
                     put("occupied", state.slot3)
-                    put("car", if (state.slot3) "Cyber Amber GT" else "Empty")
+                    put("car", if (state.slot3) "Vintage Red Classic Beetle" else "Empty")
                 })
             })
         }

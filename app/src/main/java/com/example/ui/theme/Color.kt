@@ -39,10 +39,35 @@ val BushGreenLight = Color(0xFF16A34A)
 val BushGreenDark = Color(0xFF0B4626)
 val SoilMulch = Color(0xFF3E2723)
 
+// Realistic Project Finishes (Matching User's Physical Project Photos)
+val LimeGreenPolice = Color(0xFF84CC16)
+val LimeGreenPoliceDark = Color(0xFF4D7C0F)
+val LimeGreenSport = Color(0xFFA3E635)
+val LimeGreenSportDark = Color(0xFF65A30D)
+val VintageRedClassic = Color(0xFFDC2626)
+val VintageRedClassicDark = Color(0xFF991B1B)
+
+val OrangeBarrierArm = Color(0xFFF97316)
+val StopSignRed = Color(0xFFDC2626)
+val SensorStandBlue = Color(0xFF1D4ED8)
+val DividerWhite = Color(0xFFF8FAFC)
+val DividerYellow = Color(0xFFEAB308)
+val PushPinBlue = Color(0xFF2563EB)
+val PushPinYellow = Color(0xFFEAB308)
+
+val GrassLawnLight = Color(0xFF4ADE80)
+val GrassLawnDark = Color(0xFF22C55E)
+val GrassLawnDeep = Color(0xFF16A34A)
+val TerracottaEarth = Color(0xFFB45309)
+val TreeFoliageGreen = Color(0xFF15803D)
+val TreeTrunkBrown = Color(0xFF78350F)
+val SignBlue = Color(0xFF1D4ED8)
+val SignGreen = Color(0xFF15803D)
+
 // Cars - Realistic Automotive Finishes
-val CarRedMetallic = Color(0xFFDC2626)
-val CarBlueMetallic = Color(0xFF2563EB)
-val CarAmberMetallic = Color(0xFFF59E0B)
+val CarRedMetallic = VintageRedClassic
+val CarBlueMetallic = LimeGreenSport
+val CarAmberMetallic = LimeGreenPolice
 
 // Typography
 val DarkTextPrimary = Color(0xFFF8FAFC)

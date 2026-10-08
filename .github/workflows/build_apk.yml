@@ -34,6 +34,7 @@ jobs:
 
       - name: Prepare Debug Keystore
         run: |
+          touch .env
           if [ -f "debug.keystore.base64" ]; then
             echo "Decoding existing debug.keystore..."
             base64 -d debug.keystore.base64 > debug.keystore
@@ -44,9 +45,17 @@ jobs:
               -keyalg RSA -keysize 2048 -validity 10000 \
               -dname "CN=Android Debug,O=Android,C=US"
           fi
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+          fi
 
       - name: Build Debug APK
-        run: gradle :app:assembleDebug --stacktrace
+        run: |
+          if [ -f "./gradlew" ]; then
+            ./gradlew :app:assembleDebug --stacktrace
+          else
+            gradle :app:assembleDebug --stacktrace
+          fi
 
       - name: Collect and Package APK
         run: |

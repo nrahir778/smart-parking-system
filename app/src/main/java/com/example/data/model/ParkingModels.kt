@@ -6,9 +6,16 @@ enum class GateState {
 }
 
 enum class CarType(val displayName: String, val bodyColor: Long, val styleName: String) {
-    RED_SEDAN("Red Metallic Aero Sedan", 0xFFDC2626, "Sport Sedan"),
-    BLUE_SUV("Midnight Sapphire SUV", 0xFF2563EB, "Electric SUV"),
-    YELLOW_SPORTS("Cyber Amber GT Coupe", 0xFFF59E0B, "Performance Coupe")
+    GREEN_POLICE("Lime Green Police Cruiser", 0xFF84CC16, "Police Interceptor"),
+    GREEN_SPORTS("Lime Green Sports GT", 0xFFA3E635, "Sports Coupe"),
+    RED_VINTAGE("Vintage Red Classic Coupe", 0xFFDC2626, "Vintage Classic");
+
+    companion object {
+        // Compatibility aliases
+        val RED_SEDAN = GREEN_POLICE
+        val BLUE_SUV = GREEN_SPORTS
+        val YELLOW_SPORTS = RED_VINTAGE
+    }
 }
 
 data class ParkingSlotInfo(

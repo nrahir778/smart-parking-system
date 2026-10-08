@@ -76,7 +76,7 @@ fun GatewayLiveLinkScreen(
     }
 
     var publicWebUrl by remember {
-        mutableStateOf("https://your-username.github.io/smart-parking/")
+        mutableStateOf("https://nrahir778.github.io/smart-parking-system/")
     }
 
     var showInAppWebPreview by remember { mutableStateOf(false) }
@@ -269,6 +269,22 @@ fun GatewayLiveLinkScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Quick Action Buttons
+                val shareableLink = remember(publicWebUrl, customUrlInput) {
+                    val base = publicWebUrl.trim()
+                    val ep = customUrlInput.trim()
+                    if (ep.isNotEmpty() && !ep.contains("smart-parking-iot-default-rtdb")) {
+                        try {
+                            val enc = java.net.URLEncoder.encode(ep, "UTF-8")
+                            val sep = if (base.contains("?")) "&" else "?"
+                            "$base${sep}endpoint=$enc"
+                        } catch (e: Exception) {
+                            base
+                        }
+                    } else {
+                        base
+                    }
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -277,7 +293,7 @@ fun GatewayLiveLinkScreen(
                     Button(
                         onClick = {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("Smart Parking Live Link", publicWebUrl)
+                            val clip = ClipData.newPlainText("Smart Parking Live Link", shareableLink)
                             clipboard.setPrimaryClip(clip)
                             Toast.makeText(context, "Live Link copied to clipboard!", Toast.LENGTH_SHORT).show()
                         },
@@ -298,7 +314,7 @@ fun GatewayLiveLinkScreen(
                         onClick = {
                             val sendIntent = Intent().apply {
                                 action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "Check out our school live 3-slot smart parking status: $publicWebUrl")
+                                putExtra(Intent.EXTRA_TEXT, "Check out Shree Sarkari Madhyamik Shala Lakhapar live smart parking: $shareableLink")
                                 type = "text/plain"
                             }
                             context.startActivity(Intent.createChooser(sendIntent, "Share Smart Parking Link"))
