@@ -1,0 +1,6 @@
+{
+  "name": "Smart Parking",
+  "description": "Real-time 3-slot smart parking visualizer and HC-05 Bluetooth gateway with cloud live link.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

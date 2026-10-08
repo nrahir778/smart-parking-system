@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Parking Live Dashboard | Arduino Uno + HC-05 IoT Gateway</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --surface: #131b28;
+      --surface-elevated: #1b2536;
+      --border: #26354a;
+      --emerald: #10b981;
+      --red: #ef4444;
+      --cyan: #0ea5e9;
+      --amber: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* Header */
+    header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .brand-title p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Overview Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    /* Parking Lot Deck */
+    .lot-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .lot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .asphalt-deck {
+      background: #141822;
+      border: 2px solid #232a39;
+      border-radius: 16px;
+      padding: 24px 16px 40px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      position: relative;
+    }
+
+    .slot-bay {
+      background: rgba(19, 27, 40, 0.7);
+      border: 2px dashed #333f54;
+      border-radius: 12px;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      min-height: 270px;
+      transition: all 0.4s ease;
+    }
+
+    .slot-bay.occupied {
+      border: 2px solid var(--red);
+      background: rgba(239, 68, 68, 0.05);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.15);
+    }
+
+    .slot-bay.empty {
+      border: 2px solid var(--emerald);
+      background: rgba(16, 185, 129, 0.05);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.12);
+    }
+
+    .slot-sensor-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f141f;
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
+    }
+
+    .sensor-led {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .sensor-led.green {
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    .sensor-led.red {
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+    }
+
+    .slot-car-area {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .car-svg {
+      width: 90px;
+      height: 165px;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.6));
+      animation: carEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes carEnter {
+      from { transform: translateY(30px) scale(0.9); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .empty-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: var(--emerald);
+    }
+
+    .empty-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.12);
+      border: 2px solid var(--emerald);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      animation: sonar 2s infinite;
+    }
+
+    @keyframes sonar {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+      70% { box-shadow: 0 0 0 16px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .wheel-stop {
+      width: 75%;
+      height: 8px;
+      background: #1e2532;
+      border-radius: 3px;
+      margin-top: 10px;
+      border: 1px solid #333f54;
+    }
+
+    /* Gate Bar Card */
+    .gate-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .gate-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .gate-open {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+    }
+
+    .gate-closed {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--red);
+      color: var(--red);
+    }
+
+    /* Telemetry log / Config */
+    .footer-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .config-box {
+      margin-top: 16px;
+      background: #0b0f17;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+    }
+
+    .config-box input {
+      background: #182233;
+      border: 1px solid var(--border);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      width: 100%;
+      margin-top: 6px;
+      font-family: monospace;
+    }
+
+    @media (max-width: 680px) {
+      .asphalt-deck {
+        grid-template-columns: 1fr;
+      }
+      .slot-bay {
+        min-height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-icon">P</div>
+        <div class="brand-title">
+          <h1>Smart Parking Public Live Link</h1>
+          <p>Shree Sarkari Madhyamik Shala Lakhapar • IoT Gateway</p>
+        </div>
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        <span id="gatewayStatusText">GATEWAY LIVE</span>
+      </div>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Available Slots</div>
+        <div class="stat-value" id="valAvailable" style="color: var(--emerald);">2 <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 free</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Occupied Slots</div>
+        <div class="stat-value" id="valOccupied" style="color: var(--cyan);">1 <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 slots</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Entry Barrier Gate</div>
+        <div class="stat-value" id="valGate">OPEN</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Buzzer Alert</div>
+        <div class="stat-value" id="valBuzzer" style="color: var(--text-muted);">OFF</div>
+      </div>
+    </div>
+
+    <!-- 3-Slot Visual Deck -->
+    <div class="lot-card">
+      <div class="lot-header">
+        <div>
+          <h2>Overhead Parking Visualizer</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Realistic top-down graphics synced with HC-05 ultrasonic sensors</p>
+        </div>
+        <button onclick="refreshData()" style="background: var(--surface-elevated); border: 1px solid var(--border); color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">
+          ↻ Refresh
+        </button>
+      </div>
+
+      <div class="asphalt-deck">
+        <!-- SLOT 1 -->
+        <div id="bay1" class="slot-bay occupied">
+          <div class="slot-sensor-bar">
+            <span><strong>SLOT 01</strong> (Trig 4 / Echo 5)</span>
+            <div id="led1" class="sensor-led red"></div>
+          </div>
+          <div class="slot-car-area" id="carArea1">
+            <!-- Red Sedan SVG -->
+            <svg class="car-svg" viewBox="0 0 100 180">
+              <rect x="5" y="10" width="90" height="160" rx="20" fill="#dc2626"/>
+              <rect x="0" y="30" width="10" height="30" rx="3" fill="#1e242b"/>
+              <rect x="90" y="30" width="10" height="30" rx="3" fill="#1e242b"/>
+              <rect x="0" y="120" width="10" height="30" rx="3" fill="#1e242b"/>
+              <rect x="90" y="120" width="10" height="30" rx="3" fill="#1e242b"/>
+              <!-- Windshield -->
+              <polygon points="20,70 30,50 70,50 80,70" fill="#0f172a"/>
+              <rect x="25" y="78" width="50" height="30" rx="6" fill="#1e293b"/>
+              <!-- Rear Windshield -->
+              <polygon points="25,120 75,120 80,138 20,138" fill="#0f172a"/>
+              <!-- Headlights -->
+              <rect x="18" y="12" width="18" height="6" rx="2" fill="#ffffff"/>
+              <rect x="64" y="12" width="18" height="6" rx="2" fill="#ffffff"/>
+              <!-- Taillights -->
+              <rect x="20" y="165" width="60" height="4" rx="2" fill="#ff2222"/>
+            </svg>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>
+          </div>
+          <div class="wheel-stop"></div>
+        </div>
+
+        <!-- SLOT 2 -->
+        <div id="bay2" class="slot-bay empty">
+          <div class="slot-sensor-bar">
+            <span><strong>SLOT 02</strong> (Trig 6 / Echo 7)</span>
+            <div id="led2" class="sensor-led green"></div>
+          </div>
+          <div class="slot-car-area" id="carArea2">
+            <div class="empty-badge">
+              <div class="empty-icon">✓</div>
+              <div style="font-size: 0.85rem; font-weight: 700;">AVAILABLE</div>
+            </div>
+          </div>
+          <div class="wheel-stop"></div>
+        </div>
+
+        <!-- SLOT 3 -->
+        <div id="bay3" class="slot-bay empty">
+          <div class="slot-sensor-bar">
+            <span><strong>SLOT 03</strong> (Trig 9 / Echo 10)</span>
+            <div id="led3" class="sensor-led green"></div>
+          </div>
+          <div class="slot-car-area" id="carArea3">
+            <div class="empty-badge">
+              <div class="empty-icon">✓</div>
+              <div style="font-size: 0.85rem; font-weight: 700;">AVAILABLE</div>
+            </div>
+          </div>
+          <div class="wheel-stop"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barrier Gate Status Card -->
+    <div class="gate-card">
+      <div>
+        <h3 style="font-size: 1rem; margin-bottom: 4px;">MG995 Servo Barrier Gate (Pin 11)</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">Automatically blocks entrance when all 3 parking bays are occupied</p>
+      </div>
+      <div id="gateBadge" class="gate-status-pill gate-open">
+        GATE OPEN (0°)
+      </div>
+    </div>
+
+    <!-- Live Telemetry & Config -->
+    <div class="footer-bar">
+      <div>Telemetry: <span id="syncTimestamp">Connected</span></div>
+      <div>Protocol: HC-05 SPP @ 9600 Baud</div>
+    </div>
+
+    <div class="config-box">
+      <strong>Firebase Realtime Database REST URL:</strong>
+      <input type="text" id="firebaseUrlInput" value="https://smart-parking-iot-default-rtdb.firebaseio.com/parking_live.json" onchange="updateFirebaseUrl()">
+      <div style="color: var(--text-muted); margin-top: 4px;">Enter your Firebase Database URL or use the Android Gateway sync endpoint.</div>
+    </div>
+  </div>
+
+  <script>
+    let firebaseUrl = localStorage.getItem('parking_firebase_url') || 'https://smart-parking-iot-default-rtdb.firebaseio.com/parking_live.json';
+    document.getElementById('firebaseUrlInput').value = firebaseUrl;
+
+    function updateFirebaseUrl() {
+      firebaseUrl = document.getElementById('firebaseUrlInput').value;
+      localStorage.setItem('parking_firebase_url', firebaseUrl);
+      refreshData();
+    }
+
+    const carSvgs = {
+      s1: `<svg class="car-svg" viewBox="0 0 100 180"><rect x="5" y="10" width="90" height="160" rx="20" fill="#dc2626"/><rect x="0" y="30" width="10" height="30" rx="3" fill="#1e242b"/><rect x="90" y="30" width="10" height="30" rx="3" fill="#1e242b"/><rect x="0" y="120" width="10" height="30" rx="3" fill="#1e242b"/><rect x="90" y="120" width="10" height="30" rx="3" fill="#1e242b"/><polygon points="20,70 30,50 70,50 80,70" fill="#0f172a"/><rect x="25" y="78" width="50" height="30" rx="6" fill="#1e293b"/><polygon points="25,120 75,120 80,138 20,138" fill="#0f172a"/><rect x="18" y="12" width="18" height="6" rx="2" fill="#ffffff"/><rect x="64" y="12" width="18" height="6" rx="2" fill="#ffffff"/><rect x="20" y="165" width="60" height="4" rx="2" fill="#ff2222"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`,
+      s2: `<svg class="car-svg" viewBox="0 0 100 180"><rect x="2" y="10" width="96" height="160" rx="24" fill="#2563eb"/><rect x="0" y="32" width="11" height="32" rx="4" fill="#181c22"/><rect x="89" y="32" width="11" height="32" rx="4" fill="#181c22"/><rect x="0" y="118" width="11" height="32" rx="4" fill="#181c22"/><rect x="89" y="118" width="11" height="32" rx="4" fill="#181c22"/><polygon points="18,65 26,45 74,45 82,65" fill="#0f172a"/><rect x="22" y="75" width="56" height="34" rx="6" fill="#1e293b"/><rect x="18" y="52" width="5" height="70" rx="2" fill="#cbd5e1"/><rect x="77" y="52" width="5" height="70" rx="2" fill="#cbd5e1"/><rect x="20" y="120" width="60" height="20" rx="4" fill="#0f172a"/><rect x="15" y="12" width="20" height="7" rx="2" fill="#ffffff"/><rect x="65" y="12" width="20" height="7" rx="2" fill="#ffffff"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`,
+      s3: `<svg class="car-svg" viewBox="0 0 100 180"><rect x="5" y="10" width="90" height="160" rx="20" fill="#f59e0b"/><rect x="0" y="30" width="10" height="30" rx="3" fill="#171717"/><rect x="90" y="30" width="10" height="30" rx="3" fill="#171717"/><rect x="0" y="120" width="10" height="30" rx="3" fill="#171717"/><rect x="90" y="120" width="10" height="30" rx="3" fill="#171717"/><rect x="28" y="24" width="12" height="16" rx="3" fill="#1e293b"/><rect x="60" y="24" width="12" height="16" rx="3" fill="#1e293b"/><polygon points="20,70 30,50 70,50 80,70" fill="#0f172a"/><rect x="25" y="78" width="50" height="28" rx="6" fill="#171717"/><polygon points="25,118 75,118 80,136 20,136" fill="#0f172a"/><rect x="14" y="152" width="72" height="6" rx="2" fill="#09090b"/><rect x="16" y="12" width="18" height="6" rx="2" fill="#ffffff"/><rect x="66" y="12" width="18" height="6" rx="2" fill="#ffffff"/></svg><div style="font-size: 0.8rem; font-weight: 700; color: var(--red); margin-top: 8px;">OCCUPIED</div>`
+    };
+
+    const emptyHtml = `<div class="empty-badge"><div class="empty-icon">✓</div><div style="font-size: 0.85rem; font-weight: 700;">AVAILABLE</div></div>`;
+
+    function updateUI(data) {
+      const s1 = Boolean(data.slot1);
+      const s2 = Boolean(data.slot2);
+      const s3 = Boolean(data.slot3);
+
+      const count = (s1 ? 1 : 0) + (s2 ? 1 : 0) + (s3 ? 1 : 0);
+      const free = 3 - count;
+      const isClosed = count >= 3 || data.gateState === 'CLOSED';
+      const buzzer = Boolean(data.buzzerAlert || isClosed);
+
+      document.getElementById('valAvailable').innerHTML = `${free} <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 free</span>`;
+      document.getElementById('valAvailable').style.color = free > 0 ? 'var(--emerald)' : 'var(--red)';
+      document.getElementById('valOccupied').innerHTML = `${count} <span style="font-size: 0.9rem; color: var(--text-muted);">/ 3 slots</span>`;
+      document.getElementById('valGate').innerHTML = isClosed ? '<span style="color:var(--red);">CLOSED (90°)</span>' : '<span style="color:var(--emerald);">OPEN (0°)</span>';
+      document.getElementById('valBuzzer').innerHTML = buzzer ? '<span style="color:var(--red);font-weight:bold;">ALERT ON (Pin 8)</span>' : 'OFF';
+
+      // Update Slot 1
+      renderSlot('bay1', 'led1', 'carArea1', s1, carSvgs.s1);
+      // Update Slot 2
+      renderSlot('bay2', 'led2', 'carArea2', s2, carSvgs.s2);
+      // Update Slot 3
+      renderSlot('bay3', 'led3', 'carArea3', s3, carSvgs.s3);
+
+      // Gate Badge
+      const gateBadge = document.getElementById('gateBadge');
+      if (isClosed) {
+        gateBadge.className = 'gate-status-pill gate-closed';
+        gateBadge.innerText = 'GATE CLOSED (90°)';
+      } else {
+        gateBadge.className = 'gate-status-pill gate-open';
+        gateBadge.innerText = 'GATE OPEN (0°)';
+      }
+
+      document.getElementById('syncTimestamp').innerText = 'Live Synced ' + new Date().toLocaleTimeString();
+    }
+
+    function renderSlot(bayId, ledId, areaId, isOccupied, carSvg) {
+      const bay = document.getElementById(bayId);
+      const led = document.getElementById(ledId);
+      const area = document.getElementById(areaId);
+
+      if (isOccupied) {
+        bay.className = 'slot-bay occupied';
+        led.className = 'sensor-led red';
+        area.innerHTML = carSvg;
+      } else {
+        bay.className = 'slot-bay empty';
+        led.className = 'sensor-led green';
+        area.innerHTML = emptyHtml;
+      }
+    }
+
+    async function refreshData() {
+      try {
+        const res = await fetch(firebaseUrl);
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            updateUI(data);
+          }
+        }
+      } catch (e) {
+        console.log('Firebase poll fallback notice:', e);
+      }
+    }
+
+    // Auto-poll every 1.5 seconds
+    setInterval(refreshData, 1500);
+    refreshData();
+  </script>
+</body>
+</html>
