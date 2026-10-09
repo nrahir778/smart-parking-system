@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,6 +49,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.util.ParkingHaptics
 import com.example.data.model.CarType
 import com.example.data.model.GateState
 import com.example.data.model.ParkingLotState
@@ -72,8 +81,22 @@ import com.example.ui.theme.TreeTrunkBrown
 @Composable
 fun RealisticParkingLotView(
     state: ParkingLotState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onToggleSlot: ((Int) -> Unit)? = null
 ) {
+    val context = LocalContext.current
+    val haptics = remember(context) { ParkingHaptics(context) }
+    var hasLotInitialized by remember { mutableStateOf(false) }
+
+    LaunchedEffect(state.isFull) {
+        if (!hasLotInitialized) {
+            hasLotInitialized = true
+            return@LaunchedEffect
+        }
+        if (state.isFull) {
+            haptics.playLotFullAlert()
+        }
+    }
     val infiniteTransition = rememberInfiniteTransition(label = "lot_sensor_sonar")
     val sonarPulse by infiniteTransition.animateFloat(
         initialValue = 0.2f,
@@ -211,12 +234,13 @@ fun RealisticParkingLotView(
                         .padding(horizontal = 16.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Slot 1: Lime Green Police Car
+                    // Slot 1: Lime Green Sedan
                     ParkingBayOverlayItem(
                         slotId = 1,
                         isOccupied = state.slot1,
                         carType = CarType.GREEN_POLICE,
                         sonarPulse = sonarPulse,
+                        onClick = { onToggleSlot?.invoke(1) },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -228,17 +252,19 @@ fun RealisticParkingLotView(
                         isOccupied = state.slot2,
                         carType = CarType.GREEN_SPORTS,
                         sonarPulse = sonarPulse,
+                        onClick = { onToggleSlot?.invoke(2) },
                         modifier = Modifier.weight(1f)
                     )
 
                     Spacer(modifier = Modifier.width(18.dp))
 
-                    // Slot 3: Vintage Red Classic Beetle Coupe
+                    // Slot 3: Vintage Red Classic Coupe
                     ParkingBayOverlayItem(
                         slotId = 3,
                         isOccupied = state.slot3,
                         carType = CarType.RED_VINTAGE,
                         sonarPulse = sonarPulse,
+                        onClick = { onToggleSlot?.invoke(3) },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -247,7 +273,8 @@ fun RealisticParkingLotView(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0x33000000)),
+                        .background(Color(0x33000000))
+                        .clickable { onToggleSlot?.invoke(1) },
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
@@ -273,7 +300,7 @@ fun RealisticParkingLotView(
                                 color = Color(0xFF0F172A)
                             )
                             Text(
-                                text = "Connect to HC-05 to view live cars & ultrasonic readings",
+                                text = "Connect to HC-05 • Or tap deck to test car animations & haptics",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFF64748B),
                                 fontSize = 11.sp
@@ -633,12 +660,63 @@ private fun ParkingBayOverlayItem(
     isOccupied: Boolean,
     carType: CarType,
     sonarPulse: Float,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val haptics = remember(context) { ParkingHaptics(context) }
+    var hasItemInitialized by remember { mutableStateOf(false) }
+
+    // Beautiful tactile feedback when car arrives or departs
+    LaunchedEffect(isOccupied) {
+        if (!hasItemInitialized) {
+            hasItemInitialized = true
+            return@LaunchedEffect
+        }
+        if (isOccupied) {
+            haptics.playCarArrived()
+        } else {
+            haptics.playCarDeparted()
+        }
+    }
+
+    // Subtle Car Glide & Settling Animations
+    val carOffsetY by animateDpAsState(
+        targetValue = if (isOccupied) 0.dp else 38.dp,
+        animationSpec = tween(durationMillis = 420, easing = FastOutSlowInEasing),
+        label = "carOffsetY"
+    )
+    val carAlpha by animateFloatAsState(
+        targetValue = if (isOccupied) 1f else 0f,
+        animationSpec = tween(durationMillis = 320, easing = FastOutSlowInEasing),
+        label = "carAlpha"
+    )
+    val carScale by animateFloatAsState(
+        targetValue = if (isOccupied) 1f else 0.88f,
+        animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
+        label = "carScale"
+    )
+
+    // Subtle Vacant Badge Bloom Animations
+    val vacantScale by animateFloatAsState(
+        targetValue = if (!isOccupied) 1f else 0.70f,
+        animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
+        label = "vacantScale"
+    )
+    val vacantAlpha by animateFloatAsState(
+        targetValue = if (!isOccupied) 1f else 0f,
+        animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing),
+        label = "vacantAlpha"
+    )
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .testTag("slot_bay_$slotId")
+            .clip(RoundedCornerShape(12.dp))
+            .then(
+                if (onClick != null) Modifier.clickable { onClick() } else Modifier
+            )
             .padding(horizontal = 2.dp)
     ) {
         Column(
@@ -655,17 +733,42 @@ private fun ParkingBayOverlayItem(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                if (isOccupied) {
+                // Subtle floor arrival halo pulse when occupied
+                if (carAlpha > 0.05f) {
+                    Box(
+                        modifier = Modifier
+                            .size(76.dp)
+                            .clip(CircleShape)
+                            .background(ElectricCyan.copy(alpha = 0.09f * carAlpha))
+                    )
+                }
+
+                // Photorealistic Car (Glide in / out with scale & alpha)
+                if (carAlpha > 0.01f) {
                     RealisticTopDownCar(
                         carType = carType,
-                        isParked = true,
-                        modifier = Modifier.fillMaxSize()
+                        isParked = isOccupied,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .offset(y = carOffsetY)
+                            .graphicsLayer {
+                                alpha = carAlpha
+                                scaleX = carScale
+                                scaleY = carScale
+                            }
                     )
-                } else {
-                    // Vacant bay indicator
+                }
+
+                // Vacant Bay Indicator (Blooming in / out)
+                if (vacantAlpha > 0.01f) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.graphicsLayer {
+                            alpha = vacantAlpha
+                            scaleX = vacantScale
+                            scaleY = vacantScale
+                        }
                     ) {
                         Box(
                             modifier = Modifier

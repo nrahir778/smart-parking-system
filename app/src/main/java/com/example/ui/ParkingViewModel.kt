@@ -152,4 +152,26 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
     fun testCloudSync() {
         gatewaySyncManager.syncParkingState(_parkingState.value, force = true)
     }
+
+    fun toggleSlot(slotIndex: Int) {
+        val s1 = if (slotIndex == 1) !_parkingState.value.slot1 else _parkingState.value.slot1
+        val s2 = if (slotIndex == 2) !_parkingState.value.slot2 else _parkingState.value.slot2
+        val s3 = if (slotIndex == 3) !_parkingState.value.slot3 else _parkingState.value.slot3
+        val total = (if (s1) 1 else 0) + (if (s2) 1 else 0) + (if (s3) 1 else 0)
+        val gate = if (total >= 3) GateState.CLOSED else GateState.OPEN
+        val buzzer = total >= 3
+
+        val newState = _parkingState.value.copy(
+            hasReceivedData = true,
+            slot1 = s1,
+            slot2 = s2,
+            slot3 = s3,
+            totalOccupied = total,
+            gateState = gate,
+            buzzerAlert = buzzer,
+            lastUpdated = System.currentTimeMillis()
+        )
+        _parkingState.value = newState
+        gatewaySyncManager.syncParkingState(newState)
+    }
 }

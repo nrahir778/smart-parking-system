@@ -294,7 +294,10 @@ fun HomeScreen(
 
         // Realistic Top-Down Traffic Park View (Road, Greenery & Photorealistic Cars)
         RealisticParkingLotView(
-            state = state
+            state = state,
+            onToggleSlot = { slotId ->
+                viewModel.toggleSlot(slotId)
+            }
         )
 
         // MG995 Barrier Gate Servo & Buzzer Alert Actuator Card
