@@ -43,11 +43,16 @@ class GatewaySyncManager {
     private var lastSyncedJson = ""
 
     fun updateEndpoint(url: String) {
-        val trimmed = url.trim()
+        var trimmed = url.trim()
+        if (trimmed.isNotBlank() && !trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+            // User entered a Firebase Project ID: automatically format to Realtime Database endpoint
+            val cleanId = trimmed.removeSuffix("/").removeSuffix(".json")
+            trimmed = "https://$cleanId-default-rtdb.firebaseio.com/parking_live.json"
+        }
         _config.value = _config.value.copy(
             endpointUrl = trimmed,
             lastStatusCode = 0,
-            lastStatusMessage = if (trimmed.isBlank()) "Enter Firebase URL below" else "Endpoint saved: $trimmed"
+            lastStatusMessage = if (trimmed.isBlank()) "Enter Firebase URL or Project ID below" else "Endpoint configured: $trimmed"
         )
     }
 
@@ -63,10 +68,10 @@ class GatewaySyncManager {
         val payloadStr = payload.toString(2)
 
         val rawUrl = currentConfig.endpointUrl.trim()
-        if (rawUrl.isBlank() || rawUrl.contains("smart-parking-iot-default-rtdb")) {
+        if (rawUrl.isBlank()) {
             _config.value = _config.value.copy(
                 lastStatusCode = 0,
-                lastStatusMessage = "Set your Firebase project URL in settings below",
+                lastStatusMessage = "Enter your Firebase Project ID or Database URL below",
                 lastPayloadJson = payloadStr
             )
             return
@@ -101,7 +106,7 @@ class GatewaySyncManager {
                 withContext(Dispatchers.Main) {
                     val statusMsg = when (response.code) {
                         200 -> "Sync OK (${latency}ms)"
-                        404 -> "HTTP 404: Database does not exist on Firebase. Check project name."
+                        404 -> "HTTP 404: Database does not exist yet. Go to console.firebase.google.com -> Realtime Database -> Click 'Create Database'."
                         401, 403 -> "HTTP ${response.code}: Rules permission denied. In Firebase RTDB Rules, set { \".read\": true, \".write\": true }."
                         else -> "HTTP ${response.code}: ${response.message}"
                     }

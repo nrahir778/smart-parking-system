@@ -37,13 +37,6 @@ fun RealisticTopDownCar(
     modifier: Modifier = Modifier,
     isParked: Boolean = true
 ) {
-    // Smooth parking glide-in animation
-    val parkProgress by animateFloatAsState(
-        targetValue = if (isParked) 1f else 0f,
-        animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
-        label = "parkProgress"
-    )
-
     // Subtle optical headlight shimmer
     val infiniteTransition = rememberInfiniteTransition(label = "car_headlight")
     val headlightPulse by infiniteTransition.animateFloat(
@@ -57,9 +50,7 @@ fun RealisticTopDownCar(
     )
 
     Box(
-        modifier = modifier
-            .offset(y = ((1f - parkProgress) * 25).dp)
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -67,9 +58,9 @@ fun RealisticTopDownCar(
             val h = size.height
 
             when (carType) {
-                CarType.GREEN_POLICE -> drawLimeGreenSedan(w, h, headlightPulse, parkProgress)
-                CarType.GREEN_SPORTS -> drawLimeGreenSportsCoupe(w, h, headlightPulse, parkProgress)
-                CarType.RED_VINTAGE -> drawVintageRedCoupe(w, h, headlightPulse, parkProgress)
+                CarType.GREEN_POLICE -> drawLimeGreenSedan(w, h, headlightPulse)
+                CarType.GREEN_SPORTS -> drawLimeGreenSportsCoupe(w, h, headlightPulse)
+                CarType.RED_VINTAGE -> drawVintageRedCoupe(w, h, headlightPulse)
             }
         }
     }
@@ -78,12 +69,12 @@ fun RealisticTopDownCar(
 // -----------------------------------------------------------------------------------------
 // 1. SLOT 1: LIME GREEN MODERN SEDAN (Minimalist, Sleek, Proportional)
 // -----------------------------------------------------------------------------------------
-private fun DrawScope.drawLimeGreenSedan(w: Float, h: Float, pulse: Float, progress: Float) {
-    // Proportional dimensions: 1.68 length-to-width ratio
-    val carW = (w * 0.64f).coerceIn(44f, 62f)
+private fun DrawScope.drawLimeGreenSedan(w: Float, h: Float, pulse: Float) {
+    // Proportional dimensions: 1.68 length-to-width ratio, dynamically scaled to stall
+    val carW = (w * 0.62f).coerceAtMost(h / 1.70f)
     val carH = carW * 1.68f
     val cx = w / 2f
-    val cy = h / 2f + (1f - progress) * 6f
+    val cy = h / 2f
     val left = cx - carW / 2f
     val top = cy - carH / 2f
 
@@ -235,12 +226,12 @@ private fun DrawScope.drawLimeGreenSedan(w: Float, h: Float, pulse: Float, progr
 // -----------------------------------------------------------------------------------------
 // 2. SLOT 2: LIME GREEN SPORTS GT COUPE (Minimalist, Sporty, Proportional)
 // -----------------------------------------------------------------------------------------
-private fun DrawScope.drawLimeGreenSportsCoupe(w: Float, h: Float, pulse: Float, progress: Float) {
-    // Sporty dimensions: ~1.65 ratio, slightly wider stance
-    val carW = (w * 0.66f).coerceIn(46f, 64f)
+private fun DrawScope.drawLimeGreenSportsCoupe(w: Float, h: Float, pulse: Float) {
+    // Sporty dimensions: ~1.65 ratio, slightly wider stance, dynamically scaled
+    val carW = (w * 0.64f).coerceAtMost(h / 1.66f)
     val carH = carW * 1.65f
     val cx = w / 2f
-    val cy = h / 2f + (1f - progress) * 6f
+    val cy = h / 2f
     val left = cx - carW / 2f
     val top = cy - carH / 2f
 
@@ -373,12 +364,12 @@ private fun DrawScope.drawLimeGreenSportsCoupe(w: Float, h: Float, pulse: Float,
 // -----------------------------------------------------------------------------------------
 // 3. SLOT 3: VINTAGE RED CLASSIC COUPE (Minimalist, Contoured, Proportional)
 // -----------------------------------------------------------------------------------------
-private fun DrawScope.drawVintageRedCoupe(w: Float, h: Float, pulse: Float, progress: Float) {
-    // Proportional dimensions: 1.66 ratio
-    val carW = (w * 0.64f).coerceIn(44f, 60f)
+private fun DrawScope.drawVintageRedCoupe(w: Float, h: Float, pulse: Float) {
+    // Proportional dimensions: 1.66 ratio, dynamically scaled
+    val carW = (w * 0.62f).coerceAtMost(h / 1.68f)
     val carH = carW * 1.66f
     val cx = w / 2f
-    val cy = h / 2f + (1f - progress) * 6f
+    val cy = h / 2f
     val left = cx - carW / 2f
     val top = cy - carH / 2f
 

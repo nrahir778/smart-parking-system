@@ -272,7 +272,7 @@ fun GatewayLiveLinkScreen(
                 val shareableLink = remember(publicWebUrl, customUrlInput) {
                     val base = publicWebUrl.trim()
                     val ep = customUrlInput.trim()
-                    if (ep.isNotEmpty() && !ep.contains("smart-parking-iot-default-rtdb")) {
+                    if (ep.isNotEmpty()) {
                         try {
                             val enc = java.net.URLEncoder.encode(ep, "UTF-8")
                             val sep = if (base.contains("?")) "&" else "?"
@@ -405,15 +405,15 @@ fun GatewayLiveLinkScreen(
                         customUrlInput = it
                         viewModel.updateGatewayEndpoint(it)
                     },
-                    label = { Text("Firebase Realtime DB URL (.json)") },
-                    placeholder = { Text("https://your-project-default-rtdb.firebaseio.com/parking_live.json") },
+                    label = { Text("Firebase Realtime DB URL or Project ID") },
+                    placeholder = { Text("Enter Project ID (e.g. my-parking-iot) or full https://... URL") },
                     modifier = Modifier.fillMaxWidth().testTag("firebase_endpoint_field"),
                     singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Firebase 404 Resolution & Setup Guide
+                // Firebase Setup & 404 Troubleshooting Guide
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -423,14 +423,14 @@ fun GatewayLiveLinkScreen(
                 ) {
                     Column {
                         Text(
-                            text = "💡 How to get your working Firebase URL (Free):",
+                            text = "💡 Quick Firebase Setup & 404 Fix:",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = ElectricCyan
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "1. Open console.firebase.google.com & create project\n2. Go to Realtime Database > Create Database\n3. In Rules tab, set: { \".read\": true, \".write\": true }\n4. Copy your database URL and paste it above!",
+                            text = "• Type your Firebase Project ID (e.g. my-parking-system) or full URL above.\n• If you see HTTP 404: Open console.firebase.google.com -> Realtime Database -> Click 'Create Database'. (Databases are only created when you click this button).\n• In the Rules tab, set: { \".read\": true, \".write\": true } to allow Arduino/Phone sync.",
                             fontSize = 10.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = 15.sp

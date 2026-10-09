@@ -74,6 +74,8 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
 
     fun parseArduinoTelemetryLine(line: String) {
         val trimmed = line.trim()
+        if (trimmed.isEmpty()) return
+
         val currentLogs = _parkingState.value.rawTelemetryLog.toMutableList()
         if (currentLogs.size > 50) currentLogs.removeAt(0)
         currentLogs.add("${System.currentTimeMillis() % 100000}: $trimmed")
@@ -84,37 +86,85 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
         var total = _parkingState.value.totalOccupied
         var gate = _parkingState.value.gateState
         var buzzer = _parkingState.value.buzzerAlert
+        var recognizedChange = false
 
-        when {
-            trimmed.startsWith("S1:", ignoreCase = true) -> {
-                s1 = trimmed.substring(3).trim().equals("OCCUPIED", ignoreCase = true)
+        // 1. JSON format support: {"s1":1, "s2":0, ...} or {"slot1":true, ...}
+        if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+            try {
+                val json = org.json.JSONObject(trimmed)
+                if (json.has("s1")) { s1 = parseSlotBool(json.getString("s1")); recognizedChange = true }
+                if (json.has("slot1")) { s1 = parseSlotBool(json.getString("slot1")); recognizedChange = true }
+                if (json.has("s2")) { s2 = parseSlotBool(json.getString("s2")); recognizedChange = true }
+                if (json.has("slot2")) { s2 = parseSlotBool(json.getString("slot2")); recognizedChange = true }
+                if (json.has("s3")) { s3 = parseSlotBool(json.getString("s3")); recognizedChange = true }
+                if (json.has("slot3")) { s3 = parseSlotBool(json.getString("slot3")); recognizedChange = true }
+                if (json.has("gate")) {
+                    gate = if (json.getString("gate").equals("CLOSED", true)) GateState.CLOSED else GateState.OPEN
+                    recognizedChange = true
+                }
+            } catch (e: Exception) {
+                // fall through to token parsing
             }
-            trimmed.startsWith("S2:", ignoreCase = true) -> {
-                s2 = trimmed.substring(3).trim().equals("OCCUPIED", ignoreCase = true)
+        }
+
+        // 2. Simple 3-digit comma/space format e.g. "1,0,1" or "1 0 1"
+        if (!recognizedChange) {
+            val parts = trimmed.split(Regex("[,|;\\s]+")).filter { it.isNotBlank() }
+            if (parts.size == 3 && parts.all { it == "0" || it == "1" }) {
+                s1 = parts[0] == "1"
+                s2 = parts[1] == "1"
+                s3 = parts[2] == "1"
+                recognizedChange = true
             }
-            trimmed.startsWith("S3:", ignoreCase = true) -> {
-                s3 = trimmed.substring(3).trim().equals("OCCUPIED", ignoreCase = true)
-            }
-            trimmed.startsWith("TOTAL:", ignoreCase = true) -> {
-                trimmed.substring(6).trim().toIntOrNull()?.let { total = it }
-            }
-            trimmed.startsWith("GATE:", ignoreCase = true) -> {
-                val stateStr = trimmed.substring(5).trim()
-                gate = if (stateStr.equals("CLOSED", ignoreCase = true)) GateState.CLOSED else GateState.OPEN
+        }
+
+        // 3. Key-Value token parsing: e.g. "S1: OCCUPIED, S2: VACANT" or individual lines
+        if (!recognizedChange) {
+            val tokens = trimmed.split(Regex("[,|;]+"))
+            for (token in tokens) {
+                val t = token.trim()
+                val lower = t.lowercase()
+                when {
+                    lower.startsWith("s1:") || lower.startsWith("slot 1:") || lower.startsWith("slot1:") -> {
+                        val v = t.substringAfter(":").trim()
+                        s1 = parseSlotBool(v)
+                        recognizedChange = true
+                    }
+                    lower.startsWith("s2:") || lower.startsWith("slot 2:") || lower.startsWith("slot2:") -> {
+                        val v = t.substringAfter(":").trim()
+                        s2 = parseSlotBool(v)
+                        recognizedChange = true
+                    }
+                    lower.startsWith("s3:") || lower.startsWith("slot 3:") || lower.startsWith("slot3:") -> {
+                        val v = t.substringAfter(":").trim()
+                        s3 = parseSlotBool(v)
+                        recognizedChange = true
+                    }
+                    lower.startsWith("total:") || lower.startsWith("count:") -> {
+                        t.substringAfter(":").trim().toIntOrNull()?.let {
+                            total = it
+                            recognizedChange = true
+                        }
+                    }
+                    lower.startsWith("gate:") -> {
+                        val stateStr = t.substringAfter(":").trim()
+                        gate = if (stateStr.equals("CLOSED", ignoreCase = true)) GateState.CLOSED else GateState.OPEN
+                        recognizedChange = true
+                    }
+                }
             }
         }
 
         val calculatedTotal = (if (s1) 1 else 0) + (if (s2) 1 else 0) + (if (s3) 1 else 0)
-        val finalTotal = if (total in 0..3) total else calculatedTotal
-        val allFull = calculatedTotal >= 3 || finalTotal >= 3
+        val allFull = calculatedTotal >= 3 || total >= 3
         buzzer = allFull
         if (allFull) {
             gate = GateState.CLOSED
         }
 
-        // Updated with real Arduino reading!
-        val newState = _parkingState.value.copy(
-            hasReceivedData = true,
+        val prevState = _parkingState.value
+        val newState = prevState.copy(
+            hasReceivedData = prevState.hasReceivedData || recognizedChange,
             isConnected = true,
             slot1 = s1,
             slot2 = s2,
@@ -122,12 +172,19 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
             totalOccupied = calculatedTotal,
             gateState = gate,
             buzzerAlert = buzzer,
-            lastUpdated = System.currentTimeMillis(),
+            lastUpdated = if (recognizedChange) System.currentTimeMillis() else prevState.lastUpdated,
             rawTelemetryLog = currentLogs
         )
 
         _parkingState.value = newState
-        gatewaySyncManager.syncParkingState(newState)
+        if (recognizedChange && (prevState.slot1 != s1 || prevState.slot2 != s2 || prevState.slot3 != s3 || prevState.gateState != gate)) {
+            gatewaySyncManager.syncParkingState(newState)
+        }
+    }
+
+    private fun parseSlotBool(v: String): Boolean {
+        val s = v.trim().lowercase()
+        return s == "occupied" || s == "1" || s == "high" || s == "true" || s == "parked" || s == "yes"
     }
 
     fun connectToDevice(address: String, name: String) {
