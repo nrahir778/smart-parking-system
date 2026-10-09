@@ -22,7 +22,7 @@ class GatewaySyncManager {
 
     companion object {
         private const val TAG = "GatewaySync"
-        const val DEFAULT_FIREBASE_URL = "https://smart-parking-iot-default-rtdb.firebaseio.com/parking_live.json"
+        const val DEFAULT_FIREBASE_URL = ""
     }
 
     private val client = OkHttpClient.Builder()
@@ -34,7 +34,7 @@ class GatewaySyncManager {
     private val _config = MutableStateFlow(
         GatewayConfig(
             enabled = true,
-            endpointUrl = DEFAULT_FIREBASE_URL
+            endpointUrl = ""
         )
     )
     val config: StateFlow<GatewayConfig> = _config.asStateFlow()
@@ -43,7 +43,12 @@ class GatewaySyncManager {
     private var lastSyncedJson = ""
 
     fun updateEndpoint(url: String) {
-        _config.value = _config.value.copy(endpointUrl = url.trim())
+        val trimmed = url.trim()
+        _config.value = _config.value.copy(
+            endpointUrl = trimmed,
+            lastStatusCode = 0,
+            lastStatusMessage = if (trimmed.isBlank()) "Enter Firebase URL below" else "Endpoint saved: $trimmed"
+        )
     }
 
     fun toggleGateway(enabled: Boolean) {
@@ -57,6 +62,16 @@ class GatewaySyncManager {
         val payload = createJsonPayload(state)
         val payloadStr = payload.toString(2)
 
+        val rawUrl = currentConfig.endpointUrl.trim()
+        if (rawUrl.isBlank() || rawUrl.contains("smart-parking-iot-default-rtdb")) {
+            _config.value = _config.value.copy(
+                lastStatusCode = 0,
+                lastStatusMessage = "Set your Firebase project URL in settings below",
+                lastPayloadJson = payloadStr
+            )
+            return
+        }
+
         // Only send if state changed or forced
         if (!force && payload.toString() == lastSyncedJson) {
             return
@@ -67,7 +82,6 @@ class GatewaySyncManager {
                 val mediaType = "application/json; charset=utf-8".toMediaType()
                 val body = payload.toString().toRequestBody(mediaType)
 
-                val rawUrl = currentConfig.endpointUrl.ifBlank { DEFAULT_FIREBASE_URL }.trim()
                 val targetUrl = when {
                     rawUrl.endsWith(".json") -> rawUrl
                     rawUrl.endsWith("/") -> "${rawUrl}parking_live.json"
@@ -80,32 +94,32 @@ class GatewaySyncManager {
 
                 val startTime = System.currentTimeMillis()
                 val response = client.newCall(request).execute()
-                val responseBody = response.body?.string() ?: ""
                 val latency = System.currentTimeMillis() - startTime
 
                 lastSyncedJson = payload.toString()
 
                 withContext(Dispatchers.Main) {
+                    val statusMsg = when (response.code) {
+                        200 -> "Sync OK (${latency}ms)"
+                        404 -> "HTTP 404: Database does not exist on Firebase. Check project name."
+                        401, 403 -> "HTTP ${response.code}: Rules permission denied. In Firebase RTDB Rules, set { \".read\": true, \".write\": true }."
+                        else -> "HTTP ${response.code}: ${response.message}"
+                    }
                     _config.value = _config.value.copy(
                         lastSyncTime = System.currentTimeMillis(),
                         lastStatusCode = response.code,
-                        lastStatusMessage = if (response.isSuccessful) {
-                            "Sync OK (${latency}ms)"
-                        } else {
-                            "HTTP ${response.code}: ${response.message}"
-                        },
-                        totalPacketsSent = _config.value.totalPacketsSent + 1,
+                        lastStatusMessage = statusMsg,
+                        totalPacketsSent = if (response.isSuccessful) _config.value.totalPacketsSent + 1 else _config.value.totalPacketsSent,
                         lastPayloadJson = payloadStr
                     )
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Gateway sync error: ${e.message}")
                 withContext(Dispatchers.Main) {
-                    // Update state to record the attempt and show payload
                     _config.value = _config.value.copy(
                         lastSyncTime = System.currentTimeMillis(),
                         lastStatusCode = -1,
-                        lastStatusMessage = "Network notice: ${e.localizedMessage ?: "Connection attempt made"}",
+                        lastStatusMessage = "Network error: ${e.localizedMessage ?: "Failed to connect"}",
                         lastPayloadJson = payloadStr
                     )
                 }

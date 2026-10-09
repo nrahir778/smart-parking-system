@@ -405,10 +405,38 @@ fun GatewayLiveLinkScreen(
                         customUrlInput = it
                         viewModel.updateGatewayEndpoint(it)
                     },
-                    label = { Text("Firebase URL") },
+                    label = { Text("Firebase Realtime DB URL (.json)") },
+                    placeholder = { Text("https://your-project-default-rtdb.firebaseio.com/parking_live.json") },
                     modifier = Modifier.fillMaxWidth().testTag("firebase_endpoint_field"),
                     singleLine = true
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Firebase 404 Resolution & Setup Guide
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(10.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "💡 How to get your working Firebase URL (Free):",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = ElectricCyan
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "1. Open console.firebase.google.com & create project\n2. Go to Realtime Database > Create Database\n3. In Rules tab, set: { \".read\": true, \".write\": true }\n4. Copy your database URL and paste it above!",
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 15.sp
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
 

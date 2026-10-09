@@ -63,12 +63,12 @@ sealed class ConnectionStatus {
 
 data class GatewayConfig(
     val enabled: Boolean = true,
-    val endpointUrl: String = "https://smart-parking-iot-default-rtdb.firebaseio.com/parking_live.json",
+    val endpointUrl: String = "",
     val autoSyncOnChange: Boolean = true,
     val syncIntervalMs: Long = 1000L,
     val lastSyncTime: Long = 0L,
     val lastStatusCode: Int = 0,
-    val lastStatusMessage: String = "Ready",
+    val lastStatusMessage: String = "Configure Firebase URL below to sync",
     val totalPacketsSent: Int = 0,
     val lastPayloadJson: String = ""
 )

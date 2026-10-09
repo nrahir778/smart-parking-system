@@ -2,13 +2,13 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Smart Traffic Parking System | Physical Model Live Gateway</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     /* -------------------------------------------------------------
-       Default Light Theme with Landscaping, Grass & Realistic Road
+       Default Light Theme & Mobile-Optimized Design System
        ------------------------------------------------------------- */
     :root, [data-theme="light"] {
       --bg: #f8fafc;
@@ -30,7 +30,7 @@
       --curb: #94a3b8;
       --deck-asphalt: #141923;
       --road-asphalt: #181f2a;
-      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      --card-shadow: 0 3px 14px rgba(0, 0, 0, 0.05);
     }
 
     [data-theme="dark"] {
@@ -48,10 +48,14 @@
       --curb: #475569;
       --deck-asphalt: #10141c;
       --road-asphalt: #141923;
-      --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
     body {
       background: var(--bg);
       color: var(--text);
@@ -60,7 +64,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px 10px 32px;
+      padding: 8px 8px 24px;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -73,68 +77,68 @@
     header {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px 16px;
-      margin-bottom: 12px;
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       box-shadow: var(--card-shadow);
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .brand-icon {
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       background: linear-gradient(135deg, #1d4ed8, #22c55e);
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 20px;
+      font-size: 18px;
       color: white;
-      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
+      box-shadow: 0 3px 10px rgba(29, 78, 216, 0.3);
       flex-shrink: 0;
     }
 
     .brand-title h1 {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       line-height: 1.2;
     }
 
     .brand-title p {
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     .live-badge {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       background: rgba(16, 185, 129, 0.15);
       border: 1px solid var(--emerald);
       color: var(--emerald);
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 700;
       transition: all 0.2s ease;
     }
@@ -146,11 +150,11 @@
     }
 
     .live-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: currentColor;
-      box-shadow: 0 0 8px currentColor;
+      box-shadow: 0 0 6px currentColor;
       animation: pulseDot 1.4s infinite;
     }
 
@@ -163,77 +167,93 @@
       background: var(--surface-elevated);
       color: var(--text);
       border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 0.76rem;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: all 0.15s ease;
+      touch-action: manipulation;
     }
-    .btn-action:hover {
-      background: var(--border);
+    .btn-action:active {
+      transform: scale(0.97);
     }
 
-    /* Live Telemetry Notice & Diagnostic Bar */
+    /* Telemetry Notice & Diagnostic Bar */
     .telemetry-banner {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 14px;
-      margin-bottom: 12px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
-      font-size: 0.78rem;
+      gap: 6px;
+      font-size: 0.75rem;
       box-shadow: var(--card-shadow);
     }
 
     .telemetry-banner .msg {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-weight: 500;
+      gap: 6px;
+      font-weight: 600;
     }
 
-    /* Simulation Control Buttons */
+    /* Simulation Control Buttons (Mobile Grid Optimized) */
     .sim-bar {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 14px;
-      margin-bottom: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 8px;
       box-shadow: var(--card-shadow);
     }
 
-    .sim-btn-group {
+    .sim-bar-header {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .sim-btn-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
-      flex-wrap: wrap;
+    }
+
+    @media (max-width: 580px) {
+      .sim-btn-group {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .sim-btn {
       background: var(--surface-elevated);
       color: var(--text);
       border: 1px solid var(--border);
-      padding: 5px 10px;
+      padding: 8px 6px;
       border-radius: 8px;
-      font-size: 0.72rem;
-      font-weight: 600;
+      font-size: 0.74rem;
+      font-weight: 700;
       cursor: pointer;
+      text-align: center;
       transition: all 0.15s ease;
+      touch-action: manipulation;
     }
-    .sim-btn:hover {
-      background: var(--border);
+    .sim-btn:active {
+      transform: scale(0.97);
     }
     .sim-btn.active {
       background: var(--cyan);
@@ -241,15 +261,15 @@
       border-color: var(--cyan);
     }
 
-    /* KPI Summary Grid */
+    /* KPI Summary Grid (Mobile Responsive 2x2) */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 6px;
+      margin-bottom: 10px;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 600px) {
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -258,23 +278,23 @@
     .stat-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 12px;
+      border-radius: 12px;
+      padding: 8px 10px;
       box-shadow: var(--card-shadow);
     }
 
     .stat-label {
-      font-size: 0.68rem;
+      font-size: 0.64rem;
       text-transform: uppercase;
       font-weight: 700;
       color: var(--text-muted);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
     }
 
     .stat-value {
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       font-weight: 800;
-      margin-top: 4px;
+      margin-top: 2px;
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -284,9 +304,9 @@
     .lot-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px;
-      margin-bottom: 12px;
+      border-radius: 16px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
       box-shadow: var(--card-shadow);
     }
 
@@ -294,22 +314,22 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 4px;
     }
 
     .lot-header-title {
-      font-size: 0.95rem;
+      font-size: 0.90rem;
       font-weight: 800;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .model-viewport {
       border: 2px solid var(--curb);
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
       background: var(--deck-asphalt);
       box-shadow: inset 0 2px 10px rgba(0,0,0,0.4);
@@ -318,36 +338,36 @@
     /* 1. TOP PARKING DECK (3 Stalls with HC-SR04 Sensors & Minimal Cars) */
     .asphalt-deck {
       background: var(--deck-asphalt);
-      padding: 14px 10px 10px;
+      padding: 10px 6px 8px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 6px;
       position: relative;
     }
 
     .slot-bay {
       background: rgba(255, 255, 255, 0.04);
       border: 2px dashed rgba(255, 255, 255, 0.25);
-      border-radius: 14px;
-      padding: 10px 6px 8px;
+      border-radius: 12px;
+      padding: 8px 4px 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      min-height: 220px;
+      min-height: 195px;
       position: relative;
       transition: all 0.25s ease;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
-    .slot-bay:hover {
-      border-color: rgba(255, 255, 255, 0.5);
-      background: rgba(255, 255, 255, 0.07);
+    .slot-bay:active {
+      transform: scale(0.98);
     }
 
     .slot-bay.occupied {
       border-style: solid;
-      border-color: rgba(239, 68, 68, 0.5);
+      border-color: rgba(239, 68, 68, 0.55);
       background: rgba(239, 68, 68, 0.06);
     }
 
@@ -363,17 +383,17 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
-      margin-bottom: 6px;
+      gap: 2px;
+      margin-bottom: 4px;
     }
 
     .rainbow-ribbon-wires {
       display: flex;
       gap: 2px;
-      height: 7px;
+      height: 6px;
     }
     .ribbon-wire {
-      width: 3.5px;
+      width: 3px;
       height: 100%;
       border-radius: 1px;
     }
@@ -381,39 +401,39 @@
     .sensor-blue-stand {
       background: #2563eb;
       border: 1px solid #1d4ed8;
-      border-radius: 6px;
-      padding: 3px 8px;
+      border-radius: 5px;
+      padding: 2px 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 4px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
     .sensor-transducers {
       display: flex;
-      gap: 3px;
+      gap: 2px;
     }
     .transducer-cylinder {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #cbd5e1;
-      border: 1.5px solid #64748b;
+      border: 1.2px solid #64748b;
     }
 
     .sensor-pin-led {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
     }
     .sensor-pin-led.green {
       background: #22c55e;
-      box-shadow: 0 0 6px #22c55e;
+      box-shadow: 0 0 5px #22c55e;
     }
     .sensor-pin-led.red {
       background: #ef4444;
-      box-shadow: 0 0 6px #ef4444;
+      box-shadow: 0 0 5px #ef4444;
     }
 
     /* Car Display Area Inside Stall */
@@ -423,13 +443,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4px 2px;
+      padding: 2px;
     }
 
     /* Minimalist Proportional SVG Car with Subtle Arrival Glide */
     .car-svg {
       width: 100%;
-      max-width: 92px;
+      max-width: 84px;
       height: auto;
       aspect-ratio: 100/160;
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
@@ -438,7 +458,7 @@
     }
 
     @keyframes carGlideIn {
-      0% { opacity: 0; transform: translateY(30px) scale(0.90); }
+      0% { opacity: 0; transform: translateY(26px) scale(0.90); }
       75% { transform: translateY(-2px) scale(1.01); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
@@ -447,7 +467,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       color: var(--emerald);
       animation: vacantBloom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -458,24 +478,24 @@
     }
 
     .empty-icon {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       border: 1.5px solid var(--emerald);
       background: rgba(16, 185, 129, 0.12);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
     }
 
     .slot-stencil-label {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 800;
       color: rgba(255, 255, 255, 0.85);
-      letter-spacing: 0.04em;
-      margin-top: 4px;
+      letter-spacing: 0.03em;
+      margin-top: 2px;
     }
 
     /* 2. MIDDLE AISLE WITH MG995 GATE & "PARKING ZONE" SIGN */
@@ -483,7 +503,7 @@
       background: #111823;
       border-top: 2px solid var(--curb);
       border-bottom: 2px solid var(--curb);
-      padding: 8px 16px;
+      padding: 6px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -494,28 +514,28 @@
       background: #1d4ed8;
       color: white;
       border: 1.5px solid white;
-      border-radius: 6px;
-      padding: 3px 10px;
-      font-size: 0.72rem;
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 0.66rem;
       font-weight: 800;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      gap: 3px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
 
     .barrier-assembly {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .boom-arm-visual {
-      width: 80px;
-      height: 8px;
+      width: 65px;
+      height: 7px;
       background: #f97316;
-      border-radius: 4px;
+      border-radius: 3px;
       position: relative;
       transform-origin: right center;
       transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -528,13 +548,13 @@
     }
 
     .stop-sign-badge {
-      width: 20px;
-      height: 20px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
       background: #ef4444;
-      border: 1.5px solid white;
+      border: 1.2px solid white;
       color: white;
-      font-size: 6.5px;
+      font-size: 5.5px;
       font-weight: 900;
       display: flex;
       align-items: center;
@@ -542,30 +562,30 @@
     }
 
     .servo-box {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       background: #18181b;
-      border: 1.5px solid #f59e0b;
+      border: 1.2px solid #f59e0b;
       border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 8px;
+      font-size: 7px;
       font-weight: 800;
       color: #f59e0b;
     }
 
     /* 3. APPROACH ROADWAY FLANKED BY LUSH GREEN GRASS & TREES */
     .approach-landscape {
-      height: 100px;
+      height: 85px;
       display: grid;
-      grid-template-columns: 1fr 140px 1fr;
+      grid-template-columns: 1fr 110px 1fr;
       position: relative;
     }
 
     .grass-field-left, .grass-field-right {
       background: linear-gradient(180deg, var(--grass-light), var(--grass-deep));
-      padding: 10px;
+      padding: 6px;
       display: flex;
       align-items: center;
       justify-content: space-around;
@@ -573,12 +593,12 @@
     }
 
     .pom-pom-tree {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, #86efac, var(--tree-foliage));
-      border: 2px solid #166534;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      border: 1.5px solid #166534;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
       position: relative;
     }
     .pom-pom-tree::after {
@@ -587,8 +607,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       background: var(--tree-trunk);
     }
@@ -596,34 +616,34 @@
     .waiting-area-sign {
       background: #1e3a8a;
       color: white;
-      border: 1.5px solid #93c5fd;
-      border-radius: 5px;
-      padding: 3px 6px;
-      font-size: 8px;
+      border: 1.2px solid #93c5fd;
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-size: 7px;
       font-weight: 800;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
     }
 
     .center-roadway {
       background: var(--road-asphalt);
-      border-left: 3px solid var(--curb);
-      border-right: 3px solid var(--curb);
+      border-left: 2px solid var(--curb);
+      border-right: 2px solid var(--curb);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 0;
+      padding: 4px 0;
     }
 
     .zebra-crosswalk {
       display: flex;
-      gap: 5px;
+      gap: 4px;
       width: 100%;
       justify-content: center;
     }
     .zebra-stripe {
-      width: 8px;
-      height: 24px;
+      width: 6px;
+      height: 20px;
       background: rgba(255, 255, 255, 0.9);
       border-radius: 1px;
     }
@@ -631,27 +651,27 @@
     .road-center-dashes {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
     .road-dash-vert {
-      width: 3.5px;
-      height: 16px;
+      width: 3px;
+      height: 12px;
       background: rgba(255, 255, 255, 0.85);
       border-radius: 1px;
     }
 
     /* Footer Status Bar */
     .footer-bar {
-      margin-top: 10px;
+      margin-top: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.72rem;
+      font-size: 0.70rem;
       color: var(--text-muted);
       flex-wrap: wrap;
-      gap: 6px;
-      padding: 0 4px;
+      gap: 4px;
+      padding: 0 2px;
     }
 
     /* Settings Drawer */
@@ -659,11 +679,10 @@
       display: none;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-top: 12px;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
       box-shadow: var(--card-shadow);
-      animation: fadeIn 0.2s ease;
     }
     .settings-drawer.open {
       display: block;
@@ -671,12 +690,12 @@
 
     .settings-drawer input {
       width: 100%;
-      padding: 8px 12px;
+      padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: var(--surface-elevated);
       color: var(--text);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-family: 'JetBrains Mono', monospace;
       outline: none;
       margin-top: 6px;
@@ -701,7 +720,7 @@
       <div class="header-actions">
         <div id="liveBadge" class="live-badge">
           <span class="live-dot"></span>
-          <span id="liveStatusText">LIVE GATEWAY</span>
+          <span id="liveStatusText">LIVE DECK</span>
         </div>
         <button class="btn-action" onclick="toggleTheme()" title="Switch Light/Dark Theme">
           <span id="themeIcon">☀️ Light</span>
@@ -716,23 +735,24 @@
     <div class="telemetry-banner">
       <div class="msg">
         <span id="streamStateIcon">🟢</span>
-        <span id="streamStateMsg">Real-time gateway stream active (Arduino Uno • HC-05 9600 Baud)</span>
+        <span id="streamStateMsg">Interactive IoT deck active • Tap any stall to park or clear</span>
       </div>
-      <div style="font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;" id="latencyLabel">
-        ⚡ SSE Live Stream (&lt;50ms)
+      <div style="font-size: 0.70rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;" id="latencyLabel">
+        ⚡ Instant Telemetry (&lt;50ms)
       </div>
     </div>
 
     <!-- Quick Simulation Preset Bar (Tap any slot or preset) -->
     <div class="sim-bar">
-      <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted);">
-        🧪 Quick Model Tests (Tap slots or presets):
-      </span>
+      <div class="sim-bar-header">
+        <span>🧪 Test Car Models &amp; Haptics:</span>
+        <span style="font-size: 0.68rem; color: var(--text-muted);">Tap stalls directly on deck</span>
+      </div>
       <div class="sim-btn-group">
         <button class="sim-btn" onclick="applyPreset([false, false, false])">All 3 Vacant</button>
-        <button class="sim-btn active" onclick="applyPreset([true, true, false])">Slots 1 & 2 Parked</button>
-        <button class="sim-btn" onclick="applyPreset([true, true, true])">Deck Full (STOP Gate)</button>
-        <button class="sim-btn" style="border-color: var(--cyan); color: var(--cyan);" onclick="revertToCloudStream()">🔄 Stream Cloud</button>
+        <button class="sim-btn active" onclick="applyPreset([true, true, false])">Slots 1 &amp; 2 Parked</button>
+        <button class="sim-btn" onclick="applyPreset([true, true, true])">Deck Full (STOP)</button>
+        <button class="sim-btn" style="border-color: var(--cyan); color: var(--cyan);" onclick="revertToCloudStream()">🔄 Cloud Stream</button>
       </div>
     </div>
 
@@ -741,27 +761,27 @@
       <div class="stat-card">
         <div class="stat-label">Available Bays</div>
         <div class="stat-value" id="valAvailable" style="color: var(--emerald);">
-          1 <span style="font-size: 0.78rem; color: var(--text-muted);">/ 3 free</span>
+          1 <span style="font-size: 0.75rem; color: var(--text-muted);">/ 3 free</span>
         </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-label">Occupied Bays</div>
         <div class="stat-value" id="valOccupied" style="color: var(--cyan);">
-          2 <span style="font-size: 0.78rem; color: var(--text-muted);">/ 3 slots</span>
+          2 <span style="font-size: 0.75rem; color: var(--text-muted);">/ 3 slots</span>
         </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-label">MG995 Gate Servo (Pin 11)</div>
-        <div class="stat-value" id="valGate" style="color: var(--emerald); font-size: 1.05rem;">
+        <div class="stat-value" id="valGate" style="color: var(--emerald); font-size: 1.0rem;">
           OPEN (0°)
         </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-label">Buzzer Alert (Pin 8)</div>
-        <div class="stat-value" id="valBuzzer" style="color: var(--text-muted); font-size: 1.05rem;">
+        <div class="stat-value" id="valBuzzer" style="color: var(--text-muted); font-size: 1.0rem;">
           OFF
         </div>
       </div>
@@ -773,7 +793,7 @@
         <div class="lot-header-title">
           <span>🚗 Traffic Parking Deck (Project Model)</span>
         </div>
-        <div style="font-size: 0.74rem; color: var(--text-muted);">
+        <div style="font-size: 0.72rem; color: var(--text-muted);">
           Tap slot to toggle car occupancy
         </div>
       </div>
@@ -795,7 +815,7 @@
                   <div class="transducer-cylinder"></div>
                   <div class="transducer-cylinder"></div>
                 </div>
-                <div style="font-size: 0.62rem; color: white; font-weight: 700;">T4/E5</div>
+                <div style="font-size: 0.60rem; color: white; font-weight: 700;">T4/E5</div>
                 <div id="led1" class="sensor-pin-led red"></div>
               </div>
             </div>
@@ -819,7 +839,7 @@
                   <div class="transducer-cylinder"></div>
                   <div class="transducer-cylinder"></div>
                 </div>
-                <div style="font-size: 0.62rem; color: white; font-weight: 700;">T6/E7</div>
+                <div style="font-size: 0.60rem; color: white; font-weight: 700;">T6/E7</div>
                 <div id="led2" class="sensor-pin-led red"></div>
               </div>
             </div>
@@ -843,7 +863,7 @@
                   <div class="transducer-cylinder"></div>
                   <div class="transducer-cylinder"></div>
                 </div>
-                <div style="font-size: 0.62rem; color: white; font-weight: 700;">T9/E10</div>
+                <div style="font-size: 0.60rem; color: white; font-weight: 700;">T9/E10</div>
                 <div id="led3" class="sensor-pin-led green"></div>
               </div>
             </div>
@@ -860,7 +880,7 @@
             <span>🅿️ PARKING ZONE</span>
           </div>
 
-          <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem; font-weight: 700;">
+          <div style="color: rgba(255,255,255,0.7); font-size: 0.70rem; font-weight: 700;">
             ⮤ ⬆ ⮥
           </div>
 
@@ -877,14 +897,12 @@
           <!-- Left Grass Lawn with Miniature Trees -->
           <div class="grass-field-left">
             <div class="pom-pom-tree"></div>
-            <div class="pom-pom-tree" style="margin-left: 20px;"></div>
             <div class="pom-pom-tree"></div>
           </div>
 
           <!-- Central Approach Roadway -->
           <div class="center-roadway">
             <div class="zebra-crosswalk">
-              <div class="zebra-stripe"></div>
               <div class="zebra-stripe"></div>
               <div class="zebra-stripe"></div>
               <div class="zebra-stripe"></div>
@@ -896,16 +914,15 @@
               <div class="road-dash-vert"></div>
             </div>
 
-            <div style="color: rgba(255,255,255,0.85); font-size: 9px; font-weight: 800;">
+            <div style="color: rgba(255,255,255,0.85); font-size: 8px; font-weight: 800;">
               ENTRY ⬆
             </div>
           </div>
 
           <!-- Right Grass Lawn with Miniature Trees & "WAITING AREA" Sign -->
           <div class="grass-field-right">
-            <div class="pom-pom-tree"></div>
             <div class="waiting-area-sign">WAITING AREA</div>
-            <div class="pom-pom-tree" style="margin-left: 15px;"></div>
+            <div class="pom-pom-tree"></div>
           </div>
         </div>
       </div>
@@ -920,17 +937,20 @@
 
     <!-- Collapsible Settings Drawer -->
     <div id="settingsDrawer" class="settings-drawer">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <strong style="font-size: 0.85rem;">Firebase Realtime Database Endpoint:</strong>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <strong style="font-size: 0.82rem;">Firebase Realtime Database Endpoint:</strong>
         <button class="btn-action" onclick="saveSettings()">Save &amp; Connect</button>
       </div>
-      <p style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px;">
-        Paste your Firebase Database URL ending in <code>.json</code> (or pass via URL parameter <code>?endpoint=...</code>):
+      <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+        Paste your Firebase Realtime DB URL ending in <code>.json</code>:
       </p>
       <input type="text" id="firebaseUrlInput" placeholder="https://your-project-id-default-rtdb.firebaseio.com/parking_live.json">
-      <div style="margin-top: 8px; font-size: 0.72rem; color: var(--text-muted);">
-        <strong>Tip:</strong> In your Firebase Console &gt; Realtime Database &gt; Rules, enable public read for IoT:
-        <code style="background: rgba(0,0,0,0.06); padding: 2px 4px; border-radius: 4px; display: block; margin-top: 4px;">{ "rules": { ".read": true, ".write": true } }</code>
+      <div style="margin-top: 8px; font-size: 0.70rem; color: var(--text-muted); line-height: 1.4;">
+        <strong>How to setup in Firebase Console:</strong><br>
+        1. Open <a href="https://console.firebase.google.com" target="_blank" style="color: var(--cyan);">console.firebase.google.com</a> &gt; Create a project.<br>
+        2. Click <strong>Realtime Database</strong> &gt; <strong>Create Database</strong>.<br>
+        3. In the <strong>Rules</strong> tab, set: <code>{ ".read": true, ".write": true }</code>.<br>
+        4. Copy your database URL and paste it above!
       </div>
     </div>
   </div>
@@ -942,13 +962,20 @@
     const urlParams = new URLSearchParams(window.location.search);
     const paramEndpoint = urlParams.get('endpoint') || urlParams.get('firebase') || urlParams.get('db') || urlParams.get('url');
     
-    let firebaseUrl = paramEndpoint || localStorage.getItem('parking_firebase_url') || 'https://smart-parking-iot-default-rtdb.firebaseio.com/parking_live.json';
+    // Purge outdated placeholder if it was previously saved
+    let savedUrl = localStorage.getItem('parking_firebase_url');
+    if (savedUrl && savedUrl.includes('smart-parking-iot-default-rtdb')) {
+      localStorage.removeItem('parking_firebase_url');
+      savedUrl = null;
+    }
+
+    let firebaseUrl = paramEndpoint || savedUrl || '';
     
-    if (!firebaseUrl.endsWith('.json')) {
+    if (firebaseUrl && !firebaseUrl.endsWith('.json')) {
       firebaseUrl = firebaseUrl.endsWith('/') ? firebaseUrl + 'parking_live.json' : firebaseUrl + '/parking_live.json';
     }
     
-    if (paramEndpoint) {
+    if (paramEndpoint && firebaseUrl) {
       localStorage.setItem('parking_firebase_url', firebaseUrl);
     }
 
@@ -991,6 +1018,10 @@
         document.getElementById('settingsDrawer').classList.remove('open');
         isSimMode = false;
         initStream();
+      } else {
+        firebaseUrl = '';
+        localStorage.removeItem('parking_firebase_url');
+        document.getElementById('settingsDrawer').classList.remove('open');
       }
     }
 
@@ -1009,32 +1040,22 @@
             <stop offset="100%" stop-color="#527e12"/>
           </linearGradient>
         </defs>
-        <!-- Ground Shadow -->
         <rect x="14" y="30" width="72" height="110" rx="16" fill="rgba(0,0,0,0.35)"/>
-        <!-- 4 Matte Dark Wheels -->
         <rect x="12" y="44" width="9" height="22" rx="3" fill="#1e242b"/>
         <rect x="79" y="44" width="9" height="22" rx="3" fill="#1e242b"/>
         <rect x="12" y="98" width="9" height="22" rx="3" fill="#1e242b"/>
         <rect x="79" y="98" width="9" height="22" rx="3" fill="#1e242b"/>
-        <!-- Lime Green Main Body -->
         <rect x="18" y="26" width="64" height="108" rx="14" fill="url(#gLimeSedan)"/>
-        <!-- Aerodynamic Side Mirrors -->
         <rect x="12" y="58" width="7" height="9" rx="2" fill="#65a30d"/>
         <rect x="81" y="58" width="7" height="9" rx="2" fill="#65a30d"/>
-        <!-- Windshield -->
         <polygon points="26,74 31,56 69,56 74,74" fill="#0f172a"/>
         <polygon points="28,72 32,58 68,58 72,72" fill="#1e293b"/>
-        <!-- Dark Tinted Roof -->
         <rect x="30" y="74" width="40" height="24" rx="3" fill="#1e293b"/>
-        <!-- Rear Window Glass -->
         <polygon points="30,98 70,98 73,112 27,112" fill="#0f172a"/>
-        <!-- Hood Character Creases -->
         <line x1="36" y1="36" x2="38" y2="52" stroke="rgba(255,255,255,0.3)" stroke-width="1.2" stroke-linecap="round"/>
         <line x1="64" y1="36" x2="62" y2="52" stroke="rgba(255,255,255,0.3)" stroke-width="1.2" stroke-linecap="round"/>
-        <!-- Projector LED Headlights -->
         <rect x="25" y="27" width="13" height="4" rx="1.5" fill="#f8fafc"/>
         <rect x="62" y="27" width="13" height="4" rx="1.5" fill="#f8fafc"/>
-        <!-- Rear LED Taillights -->
         <rect x="26" y="130" width="13" height="3" rx="1.2" fill="#ef4444"/>
         <rect x="61" y="130" width="13" height="3" rx="1.2" fill="#ef4444"/>
       </svg>`,
@@ -1050,30 +1071,20 @@
             <stop offset="100%" stop-color="#4d7c0f"/>
           </linearGradient>
         </defs>
-        <!-- Ground Shadow -->
         <rect x="13" y="30" width="74" height="108" rx="16" fill="rgba(0,0,0,0.35)"/>
-        <!-- 4 Wide Wheels -->
         <rect x="11" y="46" width="9.5" height="22" rx="3" fill="#1e242b"/>
         <rect x="79.5" y="46" width="9.5" height="22" rx="3" fill="#1e242b"/>
         <rect x="11" y="96" width="9.5" height="22" rx="3" fill="#1e242b"/>
         <rect x="79.5" y="96" width="9.5" height="22" rx="3" fill="#1e242b"/>
-        <!-- Sculpted Sport Body -->
         <rect x="17" y="27" width="66" height="106" rx="15" fill="url(#gLimeSport)"/>
-        <!-- Side Mirrors -->
         <rect x="11" y="60" width="7" height="9" rx="2" fill="#65a30d"/>
         <rect x="82" y="60" width="7" height="9" rx="2" fill="#65a30d"/>
-        <!-- Fastback Windshield -->
         <polygon points="25,74 32,56 68,56 75,74" fill="#0f172a"/>
-        <!-- Sport Fastback Roof -->
         <rect x="30" y="74" width="40" height="24" rx="4" fill="#1e293b"/>
-        <!-- Fastback Rear Window -->
         <polygon points="30,98 70,98 73,114 27,114" fill="#0f172a"/>
-        <!-- Integrated Low-Profile Rear Spoiler Strip -->
         <rect x="25" y="122" width="50" height="4" rx="1.5" fill="#1e242b"/>
-        <!-- Projector Headlights -->
         <rect x="24" y="28" width="13" height="4" rx="1.5" fill="#f8fafc"/>
         <rect x="63" y="28" width="13" height="4" rx="1.5" fill="#f8fafc"/>
-        <!-- Full-Width Taillight Bar -->
         <rect x="26" y="129" width="48" height="3" rx="1.2" fill="#ef4444"/>
       </svg>`,
 
@@ -1088,9 +1099,7 @@
             <stop offset="100%" stop-color="#881337"/>
           </linearGradient>
         </defs>
-        <!-- Ground Shadow -->
         <rect x="14" y="30" width="72" height="108" rx="18" fill="rgba(0,0,0,0.35)"/>
-        <!-- 4 Wheels with Chrome Hubcaps -->
         <rect x="12" y="46" width="9" height="21" rx="3" fill="#1e242b"/>
         <circle cx="16.5" cy="56.5" r="2.8" fill="#e2e8f0"/>
         <rect x="79" y="46" width="9" height="21" rx="3" fill="#1e242b"/>
@@ -1099,23 +1108,15 @@
         <circle cx="16.5" cy="106.5" r="2.8" fill="#e2e8f0"/>
         <rect x="79" y="96" width="9" height="21" rx="3" fill="#1e242b"/>
         <circle cx="83.5" cy="106.5" r="2.8" fill="#e2e8f0"/>
-        <!-- Classic Red Body Shell -->
         <rect x="18" y="27" width="64" height="106" rx="17" fill="url(#gRedClassic)"/>
-        <!-- Chrome Front Bumper -->
         <rect x="25" y="25" width="50" height="3.5" rx="1.5" fill="#e2e8f0"/>
-        <!-- Rounded Windshield with Center Divider Post -->
         <polygon points="26,74 32,58 68,58 74,74" fill="#0f172a"/>
         <line x1="50" y1="58" x2="50" y2="74" stroke="#dc2626" stroke-width="1.8"/>
-        <!-- Rounded Vintage Roof -->
         <rect x="30" y="74" width="40" height="24" rx="6" fill="#991b1b"/>
-        <!-- Oval Split Rear Window -->
         <ellipse cx="50" cy="105" rx="14" ry="5.5" fill="#0f172a"/>
-        <!-- Chrome Rear Bumper -->
         <rect x="25" y="130" width="50" height="3.5" rx="1.5" fill="#e2e8f0"/>
-        <!-- Classic Circular Headlights (Chrome Bezel) -->
         <circle cx="30" cy="33" r="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
         <circle cx="70" cy="33" r="5" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
-        <!-- Round Ruby Taillights -->
         <circle cx="30" cy="126" r="4" fill="#ef4444"/>
         <circle cx="70" cy="126" r="4" fill="#ef4444"/>
       </svg>`
@@ -1124,12 +1125,12 @@
     const emptySlotHtml = `
       <div class="empty-badge">
         <div class="empty-icon">✓</div>
-        <div style="font-size: 0.78rem; font-weight: 700;">VACANT</div>
+        <div style="font-size: 0.76rem; font-weight: 700;">VACANT</div>
       </div>
     `;
 
     // -------------------------------------------------------------
-    // Flexible Slot Occupancy Parser (Handles bool, int, string, object)
+    // Flexible Slot Occupancy Parser
     // -------------------------------------------------------------
     function parseOccupied(val) {
       if (val === true || val === 1 || val === '1') return true;
@@ -1192,11 +1193,11 @@
 
       // KPI Counters
       const elAvailable = document.getElementById('valAvailable');
-      elAvailable.innerHTML = `${free} <span style="font-size: 0.78rem; color: var(--text-muted);">/ 3 free</span>`;
+      elAvailable.innerHTML = `${free} <span style="font-size: 0.74rem; color: var(--text-muted);">/ 3 free</span>`;
       elAvailable.style.color = free > 0 ? 'var(--emerald)' : 'var(--red)';
 
       const elOccupied = document.getElementById('valOccupied');
-      elOccupied.innerHTML = `${count} <span style="font-size: 0.78rem; color: var(--text-muted);">/ 3 slots</span>`;
+      elOccupied.innerHTML = `${count} <span style="font-size: 0.74rem; color: var(--text-muted);">/ 3 slots</span>`;
       elOccupied.style.color = count > 0 ? 'var(--cyan)' : 'var(--text-muted)';
       
       const elGate = document.getElementById('valGate');
@@ -1221,9 +1222,9 @@
       if (isLive) {
         const liveBadge = document.getElementById('liveBadge');
         liveBadge.className = 'live-badge';
-        document.getElementById('liveStatusText').innerText = 'LIVE GATEWAY';
+        document.getElementById('liveStatusText').innerText = 'LIVE STREAM';
         document.getElementById('streamStateIcon').innerText = '🟢';
-        document.getElementById('streamStateMsg').innerText = 'Real-time telemetry stream connected to Android HC-05 gateway';
+        document.getElementById('streamStateMsg').innerText = 'Connected to cloud IoT stream';
         document.getElementById('syncTimestamp').innerText = 'Synced ' + new Date().toLocaleTimeString();
       }
     }
@@ -1274,7 +1275,7 @@
       liveBadge.className = 'live-badge waiting';
       document.getElementById('liveStatusText').innerText = 'TEST MODE';
       document.getElementById('streamStateIcon').innerText = '🧪';
-      document.getElementById('streamStateMsg').innerText = 'Interactive Model Test Active (Tap slots or click "Stream Cloud" to resume live gateway)';
+      document.getElementById('streamStateMsg').innerText = 'Interactive Model Test Active (Tap stalls or click "Cloud Stream")';
       document.getElementById('syncTimestamp').innerText = 'Manual Test ' + new Date().toLocaleTimeString();
     }
 
@@ -1300,6 +1301,17 @@
         pollTimer = null;
       }
 
+      // If no valid Firebase URL provided yet, run in standalone live deck mode
+      if (!firebaseUrl || firebaseUrl.trim() === '' || firebaseUrl.includes('smart-parking-iot-default-rtdb')) {
+        const liveBadge = document.getElementById('liveBadge');
+        liveBadge.className = 'live-badge';
+        document.getElementById('liveStatusText').innerText = 'LIVE DECK';
+        document.getElementById('streamStateIcon').innerText = '🟢';
+        document.getElementById('streamStateMsg').innerText = 'Interactive deck active. Connect your Firebase URL in Settings ⚙️';
+        document.getElementById('latencyLabel').innerText = '⚡ Standalone Mode';
+        return;
+      }
+
       // Try Firebase Realtime Database SSE
       if (window.EventSource && !isSimMode) {
         try {
@@ -1312,14 +1324,14 @@
               const res = JSON.parse(e.data);
               if (res && res.data) {
                 updateUI(res.data, true);
-                document.getElementById('latencyLabel').innerText = '⚡ Instant SSE Stream (<50ms)';
+                document.getElementById('latencyLabel').innerText = '⚡ SSE Stream (<50ms)';
               }
             } catch (err) {}
           });
 
           sse.addEventListener('open', function() {
             if (!isSimMode) {
-              document.getElementById('latencyLabel').innerText = '⚡ Instant SSE Stream (<50ms)';
+              document.getElementById('latencyLabel').innerText = '⚡ SSE Stream (<50ms)';
             }
           });
 
@@ -1337,15 +1349,15 @@
     }
 
     function startFastPolling() {
-      if (isSimMode) return;
-      document.getElementById('latencyLabel').innerText = '⚡ Fast Poll (500ms)';
+      if (isSimMode || !firebaseUrl) return;
+      document.getElementById('latencyLabel').innerText = '⚡ Fast Poll (600ms)';
       if (!pollTimer) {
-        pollTimer = setInterval(manualRefresh, 500);
+        pollTimer = setInterval(manualRefresh, 600);
       }
     }
 
     async function manualRefresh() {
-      if (isSimMode) return;
+      if (isSimMode || !firebaseUrl) return;
       try {
         const res = await fetch(firebaseUrl, { cache: 'no-store' });
         if (res.ok) {
@@ -1354,24 +1366,22 @@
             updateUI(data, true);
           }
         } else if (res.status === 404) {
-          // If default Firebase endpoint is 404, notify user and keep current view
           const liveBadge = document.getElementById('liveBadge');
           liveBadge.className = 'live-badge waiting';
-          document.getElementById('liveStatusText').innerText = 'STANDBY';
+          document.getElementById('liveStatusText').innerText = '404 NOTICE';
           document.getElementById('streamStateIcon').innerText = '⚠️';
-          document.getElementById('streamStateMsg').innerText = 'Cloud endpoint 404. Tap "⚙️ Settings" to set your Firebase URL or use quick test buttons below.';
+          document.getElementById('streamStateMsg').innerText = 'Firebase database 404. Verify project name in Settings ⚙️';
         }
       } catch (e) {
-        // Network offline or CORS notice
         const liveBadge = document.getElementById('liveBadge');
         liveBadge.className = 'live-badge waiting';
-        document.getElementById('liveStatusText').innerText = 'STANDBY';
+        document.getElementById('liveStatusText').innerText = 'CONNECTING';
         document.getElementById('streamStateIcon').innerText = '⏳';
-        document.getElementById('streamStateMsg').innerText = 'Awaiting Android HC-05 gateway telemetry stream...';
+        document.getElementById('streamStateMsg').innerText = 'Connecting to Firebase gateway stream...';
       }
     }
 
-    // Render initial sample view (Slots 1 & 2 parked with minimal cars)
+    // Render initial model state (Slots 1 & 2 parked with minimalist cars)
     updateUI({
       slot1: true,
       slot2: true,
@@ -1380,7 +1390,7 @@
       buzzerAlert: false
     }, false);
 
-    // Initialize real-time cloud stream
+    // Initialize cloud stream if endpoint configured
     initStream();
   </script>
 </body>
