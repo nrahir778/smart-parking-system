@@ -22,7 +22,7 @@ class GatewaySyncManager {
 
     companion object {
         private const val TAG = "GatewaySync"
-        const val DEFAULT_FIREBASE_URL = ""
+        const val DEFAULT_FIREBASE_URL = "https://gen-lang-client-0754829663-default-rtdb.firebaseio.com/parking_live.json"
     }
 
     private val client = OkHttpClient.Builder()
@@ -34,7 +34,7 @@ class GatewaySyncManager {
     private val _config = MutableStateFlow(
         GatewayConfig(
             enabled = true,
-            endpointUrl = ""
+            endpointUrl = DEFAULT_FIREBASE_URL
         )
     )
     val config: StateFlow<GatewayConfig> = _config.asStateFlow()
