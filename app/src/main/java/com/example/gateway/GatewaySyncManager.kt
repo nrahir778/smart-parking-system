@@ -42,17 +42,33 @@ class GatewaySyncManager {
     private val scope = CoroutineScope(Dispatchers.IO + Job())
     private var lastSyncedJson = ""
 
-    fun updateEndpoint(url: String) {
-        var trimmed = url.trim()
-        if (trimmed.isNotBlank() && !trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
-            // User entered a Firebase Project ID: automatically format to Realtime Database endpoint
-            val cleanId = trimmed.removeSuffix("/").removeSuffix(".json")
-            trimmed = "https://$cleanId-default-rtdb.firebaseio.com/parking_live.json"
+    fun resolveTargetUrl(raw: String): String {
+        var u = raw.trim()
+        if (u.isBlank()) return ""
+        if (!u.startsWith("http://") && !u.startsWith("https://")) {
+            val cleanId = u.removeSuffix("/").removeSuffix(".json")
+            return "https://$cleanId-default-rtdb.firebaseio.com/parking_live.json"
         }
+        val noSlash = u.trimEnd('/')
+        return when {
+            noSlash.endsWith("/.json") -> noSlash.replace("/.json", "/parking_live.json")
+            noSlash.endsWith("/parking_live.json") -> noSlash
+            noSlash.endsWith(".json") && !noSlash.endsWith("/parking_live.json") -> {
+                // e.g. https://...-rtdb.firebaseio.com/.json
+                noSlash.replace(".json", "parking_live.json")
+            }
+            noSlash.endsWith("/parking_live") -> "$noSlash.json"
+            else -> "$noSlash/parking_live.json"
+        }
+    }
+
+    fun updateEndpoint(url: String) {
+        val trimmed = url.trim()
+        val resolved = if (trimmed.isNotBlank()) resolveTargetUrl(trimmed) else ""
         _config.value = _config.value.copy(
-            endpointUrl = trimmed,
+            endpointUrl = if (resolved.isNotBlank()) resolved else trimmed,
             lastStatusCode = 0,
-            lastStatusMessage = if (trimmed.isBlank()) "Enter Firebase URL or Project ID below" else "Endpoint configured: $trimmed"
+            lastStatusMessage = if (trimmed.isBlank()) "Enter Firebase URL or Project ID below" else "Endpoint configured: $resolved"
         )
     }
 
@@ -77,6 +93,9 @@ class GatewaySyncManager {
             return
         }
 
+        val targetUrl = resolveTargetUrl(rawUrl)
+        if (targetUrl.isBlank()) return
+
         // Only send if state changed or forced
         if (!force && payload.toString() == lastSyncedJson) {
             return
@@ -87,11 +106,6 @@ class GatewaySyncManager {
                 val mediaType = "application/json; charset=utf-8".toMediaType()
                 val body = payload.toString().toRequestBody(mediaType)
 
-                val targetUrl = when {
-                    rawUrl.endsWith(".json") -> rawUrl
-                    rawUrl.endsWith("/") -> "${rawUrl}parking_live.json"
-                    else -> "$rawUrl/parking_live.json"
-                }
                 val request = Request.Builder()
                     .url(targetUrl)
                     .put(body) // Firebase Realtime DB REST accepts PUT to overwrite root object

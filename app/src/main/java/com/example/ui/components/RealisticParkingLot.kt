@@ -81,8 +81,7 @@ import com.example.ui.theme.TreeTrunkBrown
 @Composable
 fun RealisticParkingLotView(
     state: ParkingLotState,
-    modifier: Modifier = Modifier,
-    onToggleSlot: ((Int) -> Unit)? = null
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val haptics = remember(context) { ParkingHaptics(context) }
@@ -240,7 +239,6 @@ fun RealisticParkingLotView(
                         isOccupied = state.slot1,
                         carType = CarType.GREEN_POLICE,
                         sonarPulse = sonarPulse,
-                        onClick = { onToggleSlot?.invoke(1) },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -252,7 +250,6 @@ fun RealisticParkingLotView(
                         isOccupied = state.slot2,
                         carType = CarType.GREEN_SPORTS,
                         sonarPulse = sonarPulse,
-                        onClick = { onToggleSlot?.invoke(2) },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -264,7 +261,6 @@ fun RealisticParkingLotView(
                         isOccupied = state.slot3,
                         carType = CarType.RED_VINTAGE,
                         sonarPulse = sonarPulse,
-                        onClick = { onToggleSlot?.invoke(3) },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -273,8 +269,7 @@ fun RealisticParkingLotView(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0x33000000))
-                        .clickable { onToggleSlot?.invoke(1) },
+                        .background(Color(0x33000000)),
                     contentAlignment = Alignment.Center
                 ) {
                     Box(
@@ -300,7 +295,7 @@ fun RealisticParkingLotView(
                                 color = Color(0xFF0F172A)
                             )
                             Text(
-                                text = "Connect to HC-05 • Or tap deck to test car animations & haptics",
+                                text = "Connect to HC-05 • Live hardware data only",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFF64748B),
                                 fontSize = 11.sp
@@ -660,7 +655,6 @@ private fun ParkingBayOverlayItem(
     isOccupied: Boolean,
     carType: CarType,
     sonarPulse: Float,
-    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -714,9 +708,6 @@ private fun ParkingBayOverlayItem(
             .fillMaxSize()
             .testTag("slot_bay_$slotId")
             .clip(RoundedCornerShape(12.dp))
-            .then(
-                if (onClick != null) Modifier.clickable { onClick() } else Modifier
-            )
             .padding(horizontal = 2.dp)
     ) {
         Column(

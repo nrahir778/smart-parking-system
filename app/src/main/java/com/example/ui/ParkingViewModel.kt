@@ -118,29 +118,32 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        // 3. Key-Value token parsing: e.g. "S1: OCCUPIED, S2: VACANT" or individual lines
+        // 3. Key-Value token parsing: e.g. "S1: OCCUPIED, S2: VACANT", "S1:1 S2:0 S3:1", "D1:5cm D2:20cm D3:4cm"
         if (!recognizedChange) {
-            val tokens = trimmed.split(Regex("[,|;]+"))
+            val tokens = trimmed.split(Regex("[,;|]+|\\s+(?=[SsDdGgTt][A-Za-z0-9_]*:)"))
             for (token in tokens) {
                 val t = token.trim()
                 val lower = t.lowercase()
                 when {
-                    lower.startsWith("s1:") || lower.startsWith("slot 1:") || lower.startsWith("slot1:") -> {
+                    lower.startsWith("s1:") || lower.startsWith("slot 1:") || lower.startsWith("slot1:") ||
+                    lower.startsWith("d1:") || lower.startsWith("dist1:") || lower.startsWith("distance1:") -> {
                         val v = t.substringAfter(":").trim()
                         s1 = parseSlotBool(v)
                         recognizedChange = true
                     }
-                    lower.startsWith("s2:") || lower.startsWith("slot 2:") || lower.startsWith("slot2:") -> {
+                    lower.startsWith("s2:") || lower.startsWith("slot 2:") || lower.startsWith("slot2:") ||
+                    lower.startsWith("d2:") || lower.startsWith("dist2:") || lower.startsWith("distance2:") -> {
                         val v = t.substringAfter(":").trim()
                         s2 = parseSlotBool(v)
                         recognizedChange = true
                     }
-                    lower.startsWith("s3:") || lower.startsWith("slot 3:") || lower.startsWith("slot3:") -> {
+                    lower.startsWith("s3:") || lower.startsWith("slot 3:") || lower.startsWith("slot3:") ||
+                    lower.startsWith("d3:") || lower.startsWith("dist3:") || lower.startsWith("distance3:") -> {
                         val v = t.substringAfter(":").trim()
                         s3 = parseSlotBool(v)
                         recognizedChange = true
                     }
-                    lower.startsWith("total:") || lower.startsWith("count:") -> {
+                    lower.startsWith("total:") || lower.startsWith("count:") || lower.startsWith("occupied:") -> {
                         t.substringAfter(":").trim().toIntOrNull()?.let {
                             total = it
                             recognizedChange = true
@@ -156,10 +159,12 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
         }
 
         val calculatedTotal = (if (s1) 1 else 0) + (if (s2) 1 else 0) + (if (s3) 1 else 0)
-        val allFull = calculatedTotal >= 3 || total >= 3
+        val allFull = calculatedTotal >= 3
         buzzer = allFull
         if (allFull) {
             gate = GateState.CLOSED
+        } else if (calculatedTotal < 3 && gate == GateState.CLOSED) {
+            gate = GateState.OPEN
         }
 
         val prevState = _parkingState.value
@@ -177,14 +182,20 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
         )
 
         _parkingState.value = newState
-        if (recognizedChange && (prevState.slot1 != s1 || prevState.slot2 != s2 || prevState.slot3 != s3 || prevState.gateState != gate)) {
+        if (recognizedChange) {
             gatewaySyncManager.syncParkingState(newState)
         }
     }
 
     private fun parseSlotBool(v: String): Boolean {
-        val s = v.trim().lowercase()
-        return s == "occupied" || s == "1" || s == "high" || s == "true" || s == "parked" || s == "yes"
+        val s = v.trim().lowercase().removeSuffix("cm").removeSuffix("mm").removeSuffix("m").trim()
+        val num = s.toFloatOrNull()
+        if (num != null) {
+            // Binary 0 or 1: 1 is occupied, 0 is vacant
+            // Distance measurement (e.g. HC-SR04 cm): <= 8.0 cm means obstacle/parked, > 8.0 cm means vacant
+            return if (num in 0f..1f) num > 0.5f else num <= 8.0f
+        }
+        return s == "occupied" || s == "high" || s == "true" || s == "parked" || s == "yes" || s == "closed" || s == "in" || s == "car"
     }
 
     fun connectToDevice(address: String, name: String) {
@@ -211,24 +222,6 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun toggleSlot(slotIndex: Int) {
-        val s1 = if (slotIndex == 1) !_parkingState.value.slot1 else _parkingState.value.slot1
-        val s2 = if (slotIndex == 2) !_parkingState.value.slot2 else _parkingState.value.slot2
-        val s3 = if (slotIndex == 3) !_parkingState.value.slot3 else _parkingState.value.slot3
-        val total = (if (s1) 1 else 0) + (if (s2) 1 else 0) + (if (s3) 1 else 0)
-        val gate = if (total >= 3) GateState.CLOSED else GateState.OPEN
-        val buzzer = total >= 3
-
-        val newState = _parkingState.value.copy(
-            hasReceivedData = true,
-            slot1 = s1,
-            slot2 = s2,
-            slot3 = s3,
-            totalOccupied = total,
-            gateState = gate,
-            buzzerAlert = buzzer,
-            lastUpdated = System.currentTimeMillis()
-        )
-        _parkingState.value = newState
-        gatewaySyncManager.syncParkingState(newState)
+        // Disabled: Pure IoT sensor telemetry mode. Cars are only displayed from real hardware / cloud data.
     }
 }
