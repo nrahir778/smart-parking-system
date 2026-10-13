@@ -905,8 +905,8 @@
     const paramEndpoint = urlParams.get('endpoint') || urlParams.get('firebase') || urlParams.get('db') || urlParams.get('url');
     
     let savedUrl = localStorage.getItem('parking_firebase_url');
-    // Clear legacy placeholder if found
-    if (savedUrl && (savedUrl.includes('smart-parking-iot-default-rtdb') || savedUrl === '')) {
+    // Ensure live link defaults to user's real database URL
+    if (savedUrl && !savedUrl.includes('0754829663')) {
       localStorage.removeItem('parking_firebase_url');
       savedUrl = null;
     }
@@ -1061,10 +1061,27 @@
     // -------------------------------------------------------------
     function parseOccupied(val) {
       if (val === true || val === 1 || val === '1') return true;
+      if (val === false || val === 0 || val === '0') return false;
+      if (typeof val === 'number') {
+        return val <= 8.5 && val > 0.1;
+      }
       if (typeof val === 'string') {
         const s = val.trim().toLowerCase();
-        if (s === 'true' || s === 'occupied' || s === 'parked' || s === 'yes' || s === 'high') return true;
-        if (s === 'false' || s === 'empty' || s === 'vacant' || s === 'no' || s === '0' || s === 'low') return false;
+        if (s.includes('unoccupied') || s.includes('not occupied') || s.includes('vacant') || 
+            s.includes('empty') || s.includes('free') || s.includes('available') || 
+            s.includes('depart') || s.includes('left') || s.includes('clear') || s === 'no' || s === 'low') {
+          return false;
+        }
+        const num = parseFloat(s.replace(/cm|mm|m/g, '').trim());
+        if (!isNaN(num)) {
+          if (num === 1) return true;
+          if (num === 0) return false;
+          return num <= 8.5 && num > 0.1;
+        }
+        if (s.includes('occupied') || s.includes('park') || s.includes('detect') || 
+            s.includes('present') || s.includes('yes') || s.includes('high') || s.includes('true') || s.includes('car')) {
+          return true;
+        }
       }
       if (val && typeof val === 'object' && val.occupied !== undefined) {
         return parseOccupied(val.occupied);

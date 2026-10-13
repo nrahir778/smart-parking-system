@@ -118,27 +118,31 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        // 3. Key-Value token parsing: e.g. "S1: OCCUPIED, S2: VACANT", "S1:1 S2:0 S3:1", "D1:5cm D2:20cm D3:4cm"
+        // 3. Key-Value token parsing: e.g. "S1: OCCUPIED, S2: VACANT", "S1:1 S2:0 S3:1", "D1:5cm D2:20cm D3:4cm", "S1=1 S2=0"
         if (!recognizedChange) {
-            val tokens = trimmed.split(Regex("[,;|]+|\\s+(?=[SsDdGgTt][A-Za-z0-9_]*:)"))
+            val normalized = trimmed.replace(Regex("\\s*[:=]\\s*"), ":")
+            val tokens = normalized.split(Regex("[,;|]+|\\s+(?=[SsDdGgTtCc][A-Za-z0-9_]*:)"))
             for (token in tokens) {
                 val t = token.trim()
                 val lower = t.lowercase()
                 when {
                     lower.startsWith("s1:") || lower.startsWith("slot 1:") || lower.startsWith("slot1:") ||
-                    lower.startsWith("d1:") || lower.startsWith("dist1:") || lower.startsWith("distance1:") -> {
+                    lower.startsWith("d1:") || lower.startsWith("dist1:") || lower.startsWith("distance1:") ||
+                    lower.startsWith("car1:") || lower.startsWith("car 1:") -> {
                         val v = t.substringAfter(":").trim()
                         s1 = parseSlotBool(v)
                         recognizedChange = true
                     }
                     lower.startsWith("s2:") || lower.startsWith("slot 2:") || lower.startsWith("slot2:") ||
-                    lower.startsWith("d2:") || lower.startsWith("dist2:") || lower.startsWith("distance2:") -> {
+                    lower.startsWith("d2:") || lower.startsWith("dist2:") || lower.startsWith("distance2:") ||
+                    lower.startsWith("car2:") || lower.startsWith("car 2:") -> {
                         val v = t.substringAfter(":").trim()
                         s2 = parseSlotBool(v)
                         recognizedChange = true
                     }
                     lower.startsWith("s3:") || lower.startsWith("slot 3:") || lower.startsWith("slot3:") ||
-                    lower.startsWith("d3:") || lower.startsWith("dist3:") || lower.startsWith("distance3:") -> {
+                    lower.startsWith("d3:") || lower.startsWith("dist3:") || lower.startsWith("distance3:") ||
+                    lower.startsWith("car3:") || lower.startsWith("car 3:") -> {
                         val v = t.substringAfter(":").trim()
                         s3 = parseSlotBool(v)
                         recognizedChange = true
@@ -188,14 +192,28 @@ class ParkingViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun parseSlotBool(v: String): Boolean {
-        val s = v.trim().lowercase().removeSuffix("cm").removeSuffix("mm").removeSuffix("m").trim()
+        val raw = v.trim().lowercase()
+        // Check clear negative keywords first
+        if (raw.contains("unoccupied") || raw.contains("not occupied") || raw.contains("vacant") ||
+            raw.contains("empty") || raw.contains("free") || raw.contains("available") ||
+            raw.contains("depart") || raw.contains("left") || raw.contains("none") ||
+            raw.contains("clear") || raw == "0" || raw == "low" || raw == "false" || raw == "no" || raw == "out"
+        ) {
+            return false
+        }
+
+        val s = raw.removeSuffix("cm").removeSuffix("mm").removeSuffix("m").trim()
         val num = s.toFloatOrNull()
         if (num != null) {
             // Binary 0 or 1: 1 is occupied, 0 is vacant
-            // Distance measurement (e.g. HC-SR04 cm): <= 8.0 cm means obstacle/parked, > 8.0 cm means vacant
-            return if (num in 0f..1f) num > 0.5f else num <= 8.0f
+            // Distance measurement (e.g. HC-SR04 cm): <= 8.5 cm means obstacle/parked, > 8.5 cm means vacant
+            return if (num in 0f..1f) num > 0.5f else (num in 0.5f..8.5f)
         }
-        return s == "occupied" || s == "high" || s == "true" || s == "parked" || s == "yes" || s == "closed" || s == "in" || s == "car"
+
+        // Positive keywords
+        return raw.contains("occupied") || raw.contains("park") || raw.contains("detect") ||
+               raw.contains("present") || raw.contains("high") || raw.contains("true") ||
+               raw.contains("yes") || raw.contains("full") || raw.contains("car") || raw == "in"
     }
 
     fun connectToDevice(address: String, name: String) {
